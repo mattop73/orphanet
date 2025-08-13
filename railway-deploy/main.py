@@ -19,6 +19,13 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ConfigDict
 import uvicorn
 
+# Configure logging first
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Import Supabase diagnosis with fallback
 try:
     from supabase_diagnosis import supabase_diagnosis, initialize_supabase_diagnosis
@@ -26,13 +33,6 @@ try:
 except Exception as e:
     logger.warning(f"⚠️ Full Supabase client failed, using simple version: {e}")
     from simple_supabase_diagnosis import simple_supabase_diagnosis as supabase_diagnosis, initialize_simple_supabase_diagnosis as initialize_supabase_diagnosis
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Global variable to store the loaded data
 disease_data: Optional[pd.DataFrame] = None
