@@ -555,9 +555,9 @@ async def diagnose_disease(request: DiagnosisRequest):
     logger.info(f"🎯 Diagnosis request: mode={request.computation_mode}, symptoms={request.present_symptoms}")
     
     try:
-        # Force true Bayesian mode if requested
+        # True Bayesian mode - use Supabase full computation
         if request.computation_mode == "true":
-            logger.info("🧮 Using TRUE Bayesian computation with Supabase")
+            logger.info("🧮 Using TRUE Bayesian computation with Supabase (full normalization)")
             
             if not supabase_diagnosis or not supabase_diagnosis.is_ready:
                 raise HTTPException(status_code=503, detail="Supabase diagnosis system not ready")
@@ -594,11 +594,11 @@ async def diagnose_disease(request: DiagnosisRequest):
                 computation_mode="true"
             )
         
-        # Fast mode (default) - Try Supabase fast diagnosis first
+        # Fast mode - use Supabase fast/pre-computed diagnosis
         elif supabase_diagnosis and supabase_diagnosis.is_ready:
-            logger.info(f"🚀 Using Supabase fast diagnosis for symptoms: {request.present_symptoms}")
+            logger.info(f"🚀 Using FAST mode (pre-computed/optimized) for symptoms: {request.present_symptoms}")
             
-            # Use Supabase fast diagnosis
+            # Use Supabase fast diagnosis (pre-computed probabilities)
             result = supabase_diagnosis.fast_diagnosis(
                 request.present_symptoms,
                 request.absent_symptoms,
@@ -619,7 +619,7 @@ async def diagnose_disease(request: DiagnosisRequest):
             
             processing_time = result['processing_time_ms']
             
-            logger.info(f"⚡ Supabase fast diagnosis completed in {processing_time:.1f}ms")
+            logger.info(f"⚡ FAST mode (pre-computed) completed in {processing_time:.1f}ms")
             
             return DiagnosisResponse(
                 success=True,
