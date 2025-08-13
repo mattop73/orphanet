@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Disease Diagnosis - Interactive Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e1e8ff;
+        }
+
+        .results-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e1e8ff;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4facfe;
+        }
+
+        .symptom-search {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .symptom-search input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .symptom-search input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .symptom-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .selected-symptoms {
+            margin-bottom: 20px;
+        }
+
+        .symptom-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 25px;
+            font-size: 14px;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .symptom-tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .symptom-tag .remove:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .symptom-type-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .toggle-btn.active {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .diagnose-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .diagnose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .diagnose-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .disease-result {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .disease-result:hover {
+            transform: translateY(-2px);
+        }
+
+        .disease-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .disease-code {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .probability-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.8s ease-out;
+        }
+
+        .disease-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .matching-symptoms {
+            margin-top: 10px;
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Bayesian Disease Diagnosis</h1>
+            <p>Interactive Rare Disease Diagnosis Tool</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">🔍 Select Symptoms</h2>
+                
+                <div class="symptom-type-toggle">
+                    <div class="toggle-btn active" data-type="present">Present Symptoms</div>
+                    <div class="toggle-btn" data-type="absent">Absent Symptoms</div>
+                </div>
+
+                <div class="symptom-search">
+                    <input type="text" id="symptom-input" placeholder="Search for symptoms..." autocomplete="off">
+                    <div class="symptom-suggestions" id="symptom-suggestions"></div>
+                </div>
+
+                <div class="selected-symptoms">
+                    <h3>✅ Present Symptoms:</h3>
+                    <div id="present-symptoms"></div>
+                    
+                    <h3>❌ Absent Symptoms:</h3>
+                    <div id="absent-symptoms"></div>
+                </div>
+
+                <button class="diagnose-btn" id="diagnose-btn" onclick="performDiagnosis()">
+                    🧠 Diagnose Disease
+                </button>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title">📊 Diagnosis Results</h2>
+                <div id="results-content">
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <p>Select symptoms and click "Diagnose Disease" to see results</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let availableSymptoms = [];
+        let presentSymptoms = [];
+        let absentSymptoms = [];
+        let currentSymptomType = 'present';
+        let diagnosisChart = null;
+
+        // API configuration
+        const API_BASE = 'http://localhost:8000';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadSymptoms();
+            setupEventListeners();
+        });
+
+        // Load available symptoms from API
+        async function loadSymptoms() {
+            try {
+                console.log('Loading symptoms from API...');
+                
+                // First try a small sample to test connection
+                let response = await fetch(`${API_BASE}/symptoms?limit=10`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                // Load all symptoms
+                response = await fetch(`${API_BASE}/symptoms?limit=9000`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                const data = await response.json();
+                availableSymptoms = data.symptoms || [];
+                console.log(`Successfully loaded ${availableSymptoms.length} symptoms`);
+                console.log('First 5 symptoms:', availableSymptoms.slice(0, 5));
+                
+                // Update UI to show symptoms are loaded
+                const symptomInput = document.getElementById('symptom-input');
+                if (symptomInput) {
+                    symptomInput.placeholder = `Search from ${availableSymptoms.length} symptoms...`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading symptoms:', error);
+                showError(`Failed to load symptoms: ${error.message}<br><br>
+                    <strong>Troubleshooting:</strong><br>
+                    1. Make sure the API server is running<br>
+                    2. Check that the server started successfully<br>
+                    3. Verify the CSV data file exists`);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const symptomInput = document.getElementById('symptom-input');
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+
+            // Symptom input handling
+            symptomInput.addEventListener('input', handleSymptomInput);
+            symptomInput.addEventListener('blur', () => {
+                setTimeout(() => hideSuggestions(), 200);
+            });
+
+            // Toggle buttons
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    toggleBtns.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentSymptomType = e.target.dataset.type;
+                    symptomInput.placeholder = `Search for ${currentSymptomType} symptoms...`;
+                });
+            });
+        }
+
+        // Handle symptom input
+        function handleSymptomInput(e) {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query.length < 1) {
+                hideSuggestions();
+                return;
+            }
+
+            // Filter symptoms that contain the query and aren't already selected
+            const filtered = availableSymptoms.filter(symptom => 
+                symptom.toLowerCase().includes(query) &&
+                !presentSymptoms.includes(symptom) &&
+                !absentSymptoms.includes(symptom)
+            ).slice(0, 20); // Show more suggestions
+
+            if (filtered.length > 0) {
+                showSuggestions(filtered);
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        // Show symptom suggestions
+        function showSuggestions(symptoms) {
+            const container = document.getElementById('symptom-suggestions');
+            
+            if (symptoms.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            const query = document.getElementById('symptom-input').value;
+            container.innerHTML = symptoms.map(symptom => 
+                `<div class="suggestion-item" onclick="addSymptom('${symptom.replace(/'/g, "\\'")}')">
+                    ${highlightMatch(symptom, query)}
+                </div>`
+            ).join('');
+            
+            container.style.display = 'block';
+        }
+
+        // Highlight matching text in suggestions
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<strong style="background-color: yellow;">$1</strong>');
+        }
+
+        // Hide suggestions
+        function hideSuggestions() {
+            document.getElementById('symptom-suggestions').style.display = 'none';
+        }
+
+        // Add symptom to selected list
+        function addSymptom(symptom) {
+            if (currentSymptomType === 'present') {
+                if (!presentSymptoms.includes(symptom)) {
+                    presentSymptoms.push(symptom);
+                }
+            } else {
+                if (!absentSymptoms.includes(symptom)) {
+                    absentSymptoms.push(symptom);
+                }
+            }
+            
+            updateSymptomDisplay();
+            document.getElementById('symptom-input').value = '';
+            hideSuggestions();
+            updateDiagnoseButton();
+        }
+
+        // Remove symptom
+        function removeSymptom(symptom, type) {
+            if (type === 'present') {
+                presentSymptoms = presentSymptoms.filter(s => s !== symptom);
+            } else {
+                absentSymptoms = absentSymptoms.filter(s => s !== symptom);
+            }
+            updateSymptomDisplay();
+            updateDiagnoseButton();
+        }
+
+        // Update symptom display
+        function updateSymptomDisplay() {
+            const presentContainer = document.getElementById('present-symptoms');
+            const absentContainer = document.getElementById('absent-symptoms');
+
+            presentContainer.innerHTML = presentSymptoms.map(symptom => 
+                `<span class="symptom-tag">${symptom}<span class="remove" onclick="removeSymptom('${symptom}', 'present')">×</span></span>`
+            ).join('');
+
+            absentContainer.innerHTML = absentSymptoms.map(symptom => 
+                `<span class="symptom-tag">${symptom}<span class="remove" onclick="removeSymptom('${symptom}', 'absent')">×</span></span>`
+            ).join('');
+        }
+
+        // Update diagnose button state
+        function updateDiagnoseButton() {
+            const btn = document.getElementById('diagnose-btn');
+            btn.disabled = presentSymptoms.length === 0;
+        }
+
+        // Perform diagnosis
+        async function performDiagnosis() {
+            if (presentSymptoms.length === 0) {
+                showError('Please select at least one present symptom');
+                return;
+            }
+
+            showLoading();
+            console.log('Starting diagnosis with symptoms:', presentSymptoms);
+
+            try {
+                const requestData = {
+                    present_symptoms: presentSymptoms,
+                    absent_symptoms: absentSymptoms,
+                    top_n: 10
+                };
+
+                // Add timeout to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+                const response = await fetch(`${API_BASE}/diagnose`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Diagnosis completed:', data);
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Diagnosis error:', error);
+                if (error.name === 'AbortError') {
+                    showError('Diagnosis timed out after 30 seconds. Please try with fewer symptoms or try again.');
+                } else {
+                    showError(`Diagnosis failed: ${error.message}<br><br>
+                        <strong>Troubleshooting:</strong><br>
+                        1. Try with fewer symptoms<br>
+                        2. Check browser console for details<br>
+                        3. Ensure API server is running properly`);
+                }
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            const container = document.getElementById('results-content');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing symptoms and calculating probabilities...</p>
+                </div>
+            `;
+        }
+
+        // Display results
+        function displayResults(data) {
+            const container = document.getElementById('results-content');
+            
+            if (!data.success || data.results.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <p>No matching diseases found for the selected symptoms.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create stats
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">${data.results.length}</span>
+                        <span class="stat-label">Matches Found</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.total_diseases_evaluated}</span>
+                        <span class="stat-label">Diseases Evaluated</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${Math.round(data.processing_time_ms)}ms</span>
+                        <span class="stat-label">Processing Time</span>
+                    </div>
+                </div>
+            `;
+
+            // Create disease results
+            const resultsHtml = data.results.map((result, index) => `
+                <div class="disease-result">
+                    <div class="disease-name">${result.disorder_name}</div>
+                    <div class="disease-code">Orpha Code: ${result.orpha_code}</div>
+                    
+                    <div class="probability-bar">
+                        <div class="probability-fill" style="width: ${(result.probability * 100)}%"></div>
+                    </div>
+                    
+                    <div class="disease-stats">
+                        <span>Probability: ${(result.probability * 100).toFixed(2)}%</span>
+                        <span>Confidence: ${(result.confidence_score * 100).toFixed(1)}%</span>
+                    </div>
+                    
+                    <div class="matching-symptoms">
+                        <strong>Matching symptoms (${result.matching_symptoms.length}/${result.total_symptoms}):</strong><br>
+                        ${result.matching_symptoms.join(', ')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Chart container
+            const chartHtml = `
+                <div class="chart-container">
+                    <canvas id="diagnosis-chart"></canvas>
+                </div>
+            `;
+
+            container.innerHTML = statsHtml + resultsHtml + chartHtml;
+
+            // Create chart
+            createDiagnosisChart(data.results);
+        }
+
+        // Create diagnosis chart
+        function createDiagnosisChart(results) {
+            const ctx = document.getElementById('diagnosis-chart');
+            
+            if (diagnosisChart) {
+                diagnosisChart.destroy();
+            }
+
+            const top5Results = results.slice(0, 5);
+            
+            diagnosisChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top5Results.map(r => r.disorder_name.length > 30 ? 
+                        r.disorder_name.substring(0, 30) + '...' : r.disorder_name),
+                    datasets: [{
+                        label: 'Probability (%)',
+                        data: top5Results.map(r => (r.probability * 100).toFixed(2)),
+                        backgroundColor: [
+                            'rgba(79, 172, 254, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(118, 75, 162, 0.8)',
+                            'rgba(245, 87, 108, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(79, 172, 254, 1)',
+                            'rgba(240, 147, 251, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(118, 75, 162, 1)',
+                            'rgba(245, 87, 108, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 5 Disease Probabilities'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: Math.max(...top5Results.map(r => r.probability * 100)) * 1.2,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            const container = document.getElementById('results-content');
+            container.innerHTML = `
+                <div class="error-message">
+                    <strong>Error:</strong> ${message}
+                </div>
+                <div style="text-align: center; color: #666; padding: 20px;">
+                    <p>Please check that the API is running and try again.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
