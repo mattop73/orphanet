@@ -5,6 +5,7 @@ A FastAPI application for rare disease diagnosis using Bayesian inference
 """
 
 import os
+import sys
 import logging
 from typing import List, Dict, Any, Optional, Union
 from contextlib import asynccontextmanager
@@ -99,14 +100,25 @@ def load_disease_data() -> bool:
     
     try:
         logger.info(f"Loading disease data from {csv_file}")
+        logger.info(f"Current working directory: {os.getcwd()}")
+        logger.info(f"Directory contents: {os.listdir('.')}")
         
         # Try to load from current directory first, then from file/ directory
         if os.path.exists(csv_file):
             data_path = csv_file
+            logger.info(f"Found CSV file in current directory: {data_path}")
         elif os.path.exists(f"file/{csv_file}"):
             data_path = f"file/{csv_file}"
+            logger.info(f"Found CSV file in file/ directory: {data_path}")
         else:
+            # Check if file/ directory exists
+            if os.path.exists("file/"):
+                logger.info(f"file/ directory contents: {os.listdir('file/')}")
             logger.error(f"CSV file not found: {csv_file}")
+            logger.error("Available files in current directory:")
+            for f in os.listdir('.'):
+                if f.endswith('.csv'):
+                    logger.error(f"  - {f}")
             return False
         
         # Load CSV data
@@ -238,12 +250,12 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Add CORS middleware
+# Add CORS middleware - more restrictive for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],  # Allow all origins for now - can be restricted later
+    allow_credentials=False,  # Set to False for wildcard origins
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -598,16 +610,18 @@ async def upload_data(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    # Configuration from environment variables
+    # Configuration from environment variables (Railway uses PORT)
     host = os.getenv("API_HOST", "0.0.0.0")
-    port = int(os.getenv("API_PORT", "8000"))
-    workers = int(os.getenv("API_WORKERS", "1"))
+    port = int(os.getenv("PORT", os.getenv("API_PORT", "8000")))  # Railway uses PORT
     log_level = os.getenv("LOG_LEVEL", "info").lower()
     
-    logger.info(f"Starting server on {host}:{port}")
+    logger.info(f"🚀 Railway: Starting Bayesian Disease Diagnosis API...")
+    logger.info(f"🐍 Python version: {sys.version}")
+    logger.info(f"📁 Working directory: {os.getcwd()}")
+    logger.info(f"🌐 Starting server on {host}:{port}")
     
     uvicorn.run(
-        "main:app",
+        app,  # Pass app directly instead of string
         host=host,
         port=port,
         log_level=log_level,

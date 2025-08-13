@@ -284,7 +284,8 @@
         // Global variables
         let allSymptoms = [];
         let selectedSymptoms = [];
-        const API_BASE = 'http://localhost:8000';
+        // Dynamically determine API base URL
+const API_BASE = window.location.origin;
 
         // DOM elements
         const searchInput = document.getElementById('search-input');
