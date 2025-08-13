@@ -1,0 +1,615 @@
+#!/usr/bin/env python3
+"""
+Bayesian Disease Diagnosis API
+A FastAPI application for rare disease diagnosis using Bayesian inference
+"""
+
+import os
+import logging
+from typing import List, Dict, Any, Optional, Union
+from contextlib import asynccontextmanager
+
+import pandas as pd
+import numpy as np
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field, ConfigDict
+import uvicorn
+
+# Import local fast diagnosis
+from local_fast_diagnosis import fast_diagnosis, initialize_fast_diagnosis
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Global variable to store the loaded data
+disease_data: Optional[pd.DataFrame] = None
+symptoms_list: List[str] = []
+diseases_list: List[str] = []
+
+
+class DiagnosisRequest(BaseModel):
+    """Request model for diagnosis endpoint"""
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "present_symptoms": ["Seizure", "Intellectual disability"],
+                "absent_symptoms": ["Fever"],
+                "top_n": 10
+            }
+        }
+    )
+    
+    present_symptoms: List[str] = Field(
+        ..., 
+        description="List of symptoms that are present in the patient",
+        min_length=1
+    )
+    absent_symptoms: List[str] = Field(
+        default_factory=list,
+        description="List of symptoms that are explicitly absent in the patient"
+    )
+    top_n: int = Field(
+        default=10,
+        description="Number of top diagnoses to return",
+        ge=1,
+        le=50
+    )
+
+
+class DiagnosisResult(BaseModel):
+    """Response model for diagnosis results"""
+    disorder_name: str = Field(..., description="Name of the rare disorder")
+    orpha_code: str = Field(..., description="Orphanet disorder code")
+    probability: float = Field(..., description="Calculated probability (0-1)")
+    matching_symptoms: List[str] = Field(..., description="Symptoms that match the input")
+    total_symptoms: int = Field(..., description="Total number of symptoms for this disorder")
+    confidence_score: float = Field(..., description="Confidence score based on symptom coverage")
+
+
+class DiagnosisResponse(BaseModel):
+    """Complete response model for diagnosis endpoint"""
+    success: bool = Field(..., description="Whether the diagnosis was successful")
+    results: List[DiagnosisResult] = Field(..., description="List of diagnosis results")
+    total_diseases_evaluated: int = Field(..., description="Total number of diseases evaluated")
+    input_symptoms: List[str] = Field(..., description="Input symptoms that were processed")
+    processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+
+
+class SystemInfo(BaseModel):
+    """System information model"""
+    total_diseases: int
+    total_symptoms: int
+    total_associations: int
+    api_version: str
+    status: str
+
+
+def load_disease_data() -> bool:
+    """Load disease data from CSV file"""
+    global disease_data, symptoms_list, diseases_list
+    
+    csv_file = "clinical_signs_and_symptoms_in_rare_diseases.csv"
+    
+    try:
+        logger.info(f"Loading disease data from {csv_file}")
+        
+        # Try to load from current directory first, then from file/ directory
+        if os.path.exists(csv_file):
+            data_path = csv_file
+        elif os.path.exists(f"file/{csv_file}"):
+            data_path = f"file/{csv_file}"
+        else:
+            logger.error(f"CSV file not found: {csv_file}")
+            return False
+        
+        # Load CSV data
+        disease_data = pd.read_csv(data_path)
+        logger.info(f"Loaded {len(disease_data)} records from CSV")
+        
+        # Clean the data
+        disease_data = disease_data.dropna(subset=['orpha_code', 'disorder_name', 'hpo_term'])
+        logger.info(f"After cleaning: {len(disease_data)} records")
+        
+        # Create frequency mapping
+        frequency_mapping = {
+            'Very frequent (99-80%)': 0.9,
+            'Frequent (79-30%)': 0.55,
+            'Occasional (29-5%)': 0.17,
+            'Very rare (<5%)': 0.025,
+            'Excluded (0%)': 0.0
+        }
+        
+        # Add numeric frequency column
+        disease_data['frequency_numeric'] = disease_data['hpo_frequency'].map(
+            lambda x: frequency_mapping.get(str(x).strip(), 0.5) if pd.notna(x) else 0.5
+        )
+        
+        # Extract unique symptoms and diseases
+        symptoms_list = sorted(disease_data['hpo_term'].dropna().unique().tolist())
+        diseases_list = sorted(disease_data['disorder_name'].dropna().unique().tolist())
+        
+        logger.info(f"Loaded {len(diseases_list)} unique diseases and {len(symptoms_list)} unique symptoms")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error loading disease data: {e}")
+        return False
+
+
+def calculate_bayesian_probability(
+    disease_name: str,
+    present_symptoms: List[str],
+    absent_symptoms: List[str] = None
+) -> Dict[str, Any]:
+    """Calculate Bayesian probability for a specific disease given symptoms"""
+    global disease_data
+    
+    if absent_symptoms is None:
+        absent_symptoms = []
+    
+    # Get disease data (optimized with direct filtering)
+    disease_symptoms = disease_data[disease_data['disorder_name'] == disease_name]
+    
+    if disease_symptoms.empty:
+        return {
+            'probability': 0.0,
+            'matching_symptoms': [],
+            'total_symptoms': 0,
+            'confidence_score': 0.0
+        }
+    
+    # Pre-calculate symptom frequency mapping for this disease
+    symptom_freq_map = dict(zip(disease_symptoms['hpo_term'], disease_symptoms['frequency_numeric']))
+    
+    # Calculate likelihood more efficiently
+    likelihood = 1.0
+    matching_symptoms = []
+    
+    # For present symptoms
+    for symptom in present_symptoms:
+        if symptom in symptom_freq_map:
+            freq = symptom_freq_map[symptom]
+            likelihood *= freq
+            matching_symptoms.append(symptom)
+        else:
+            # Symptom not associated with this disease
+            likelihood *= 0.05  # Small probability for unseen symptoms
+    
+    # For absent symptoms (reduce likelihood if symptom is frequent in this disease)
+    for symptom in absent_symptoms:
+        if symptom in symptom_freq_map:
+            freq = symptom_freq_map[symptom]
+            # If symptom is frequent in disease but absent in patient, reduce likelihood
+            likelihood *= (1 - freq)
+    
+    # Calculate posterior probability (simplified Bayes with normalization)
+    # Use a more reasonable prior based on matching symptoms
+    prior = max(0.001, len(matching_symptoms) / len(present_symptoms)) if present_symptoms else 0.001
+    posterior = prior * likelihood
+    
+    # Calculate confidence score based on symptom coverage
+    total_disease_symptoms = len(disease_symptoms)
+    confidence_score = len(matching_symptoms) / max(len(present_symptoms), 1)
+    
+    return {
+        'probability': min(posterior, 1.0),  # Cap at 1.0
+        'matching_symptoms': matching_symptoms,
+        'total_symptoms': total_disease_symptoms,
+        'confidence_score': confidence_score
+    }
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager"""
+    # Startup
+    logger.info("Starting Enhanced Bayesian Disease Diagnosis API...")
+    
+    # Try fast diagnosis first
+    if initialize_fast_diagnosis():
+        logger.info("✅ Fast diagnosis system ready!")
+    else:
+        # Fallback to regular CSV loading
+        logger.info("Falling back to regular CSV loading...")
+        success = load_disease_data()
+        if not success:
+            logger.error("Failed to load disease data")
+        else:
+            logger.info("Disease data loaded successfully")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down Enhanced Bayesian Disease Diagnosis API...")
+
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Bayesian Disease Diagnosis API",
+    description="API for rare disease diagnosis using Bayesian inference on Orphanet data",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    """Serve the main web interface with enhanced symptom selection"""
+    try:
+        with open("index.html", "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="""
+        <html>
+            <body>
+                <h1>Bayesian Disease Diagnosis API</h1>
+                <p>API is running! Visit <a href="/docs">/docs</a> for API documentation.</p>
+                <p>Web interface not found. Please ensure index.html is in the same directory.</p>
+                <p><a href="/selector">Try simple selector</a></p>
+            </body>
+        </html>
+        """)
+
+@app.get("/selector", response_class=HTMLResponse)
+async def symptom_selector():
+    """Serve the simple symptom selector interface"""
+    try:
+        with open("symptom_selector.html", "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="""
+        <html>
+            <body>
+                <h1>Symptom Selector Not Found</h1>
+                <p>Please ensure symptom_selector.html is in the same directory.</p>
+                <p><a href="/full">Try full interface</a> | <a href="/docs">API docs</a></p>
+            </body>
+        </html>
+        """)
+
+@app.get("/full", response_class=HTMLResponse)
+async def full_interface():
+    """Serve the full complex interface"""
+    try:
+        with open("index.html", "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="""
+        <html>
+            <body>
+                <h1>Full Interface Not Found</h1>
+                <p>Please ensure index.html is in the same directory.</p>
+                <p><a href="/selector">Back to simple selector</a></p>
+            </body>
+        </html>
+        """)
+
+@app.get("/api", response_model=Dict[str, str])
+async def api_info():
+    """API information endpoint"""
+    return {
+        "message": "Bayesian Disease Diagnosis API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health",
+        "selector": "/selector"
+    }
+
+
+@app.get("/health", response_model=Dict[str, Union[str, bool]])
+async def health_check():
+    """Health check endpoint"""
+    global disease_data
+    
+    is_healthy = disease_data is not None and not disease_data.empty
+    
+    return {
+        "status": "healthy" if is_healthy else "unhealthy",
+        "data_loaded": is_healthy,
+        "timestamp": pd.Timestamp.now().isoformat()
+    }
+
+
+@app.get("/info", response_model=SystemInfo)
+async def system_info():
+    """Get system information"""
+    global disease_data, symptoms_list, diseases_list
+    
+    if disease_data is None:
+        raise HTTPException(status_code=503, detail="Disease data not loaded")
+    
+    return SystemInfo(
+        total_diseases=len(diseases_list),
+        total_symptoms=len(symptoms_list),
+        total_associations=len(disease_data),
+        api_version="1.0.0",
+        status="operational"
+    )
+
+
+@app.get("/symptoms")
+async def get_symptoms(
+    search: Optional[str] = Query(None, description="Search term to filter symptoms"),
+    limit: int = Query(50, ge=1, le=10000, description="Maximum number of symptoms to return")
+):
+    """Get list of available symptoms"""
+    global symptoms_list
+    
+    # Try fast diagnosis first
+    if fast_diagnosis.is_ready:
+        fast_symptoms = fast_diagnosis.get_symptoms(search, limit)
+        return {
+            "symptoms": fast_symptoms,
+            "total_available": len(fast_diagnosis.symptoms_list),
+            "filtered_count": len(fast_symptoms),
+            "search_term": search,
+            "method": "local_fast"
+        }
+    
+    # Fallback to regular method
+    if not symptoms_list:
+        raise HTTPException(status_code=503, detail="Disease data not loaded")
+    
+    filtered_symptoms = symptoms_list
+    
+    if search:
+        search_lower = search.lower()
+        filtered_symptoms = [
+            symptom for symptom in symptoms_list
+            if search_lower in symptom.lower()
+        ]
+    
+    return {
+        "symptoms": filtered_symptoms[:limit],
+        "total_available": len(symptoms_list),
+        "filtered_count": len(filtered_symptoms),
+        "search_term": search,
+        "method": "regular"
+    }
+
+
+@app.get("/diseases")
+async def get_diseases(
+    search: Optional[str] = Query(None, description="Search term to filter diseases"),
+    limit: int = Query(50, ge=1, le=10000, description="Maximum number of diseases to return")
+):
+    """Get list of available diseases"""
+    global diseases_list
+    
+    if not diseases_list:
+        raise HTTPException(status_code=503, detail="Disease data not loaded")
+    
+    filtered_diseases = diseases_list
+    
+    if search:
+        search_lower = search.lower()
+        filtered_diseases = [
+            disease for disease in diseases_list
+            if search_lower in disease.lower()
+        ]
+    
+    return {
+        "diseases": filtered_diseases[:limit],
+        "total_available": len(diseases_list),
+        "filtered_count": len(filtered_diseases),
+        "search_term": search
+    }
+
+
+@app.post("/diagnose", response_model=DiagnosisResponse)
+async def diagnose_disease(request: DiagnosisRequest):
+    """
+    Perform ultra-fast Bayesian disease diagnosis using local pre-computed probabilities
+    """
+    global disease_data, diseases_list, symptoms_list
+    
+    import time
+    start_time = time.time()
+    
+    try:
+        # Try ultra-fast diagnosis first
+        if fast_diagnosis.is_ready:
+            logger.info(f"🚀 Using ultra-fast diagnosis for symptoms: {request.present_symptoms}")
+            
+            # Validate symptoms using fast diagnosis
+            valid_present_symptoms = [
+                symptom for symptom in request.present_symptoms
+                if symptom in fast_diagnosis.symptoms_list
+            ]
+            
+            if not valid_present_symptoms:
+                raise HTTPException(
+                    status_code=400,
+                    detail="None of the provided symptoms are found in the database"
+                )
+            
+            valid_absent_symptoms = [
+                symptom for symptom in request.absent_symptoms
+                if symptom in fast_diagnosis.symptoms_list
+            ]
+            
+            # Use ultra-fast diagnosis
+            result = fast_diagnosis.ultra_fast_diagnosis(
+                valid_present_symptoms,
+                valid_absent_symptoms,
+                request.top_n
+            )
+            
+            # Convert to API format
+            api_results = []
+            for res in result['results']:
+                api_results.append(DiagnosisResult(
+                    disorder_name=res['disorder_name'],
+                    orpha_code=res['orpha_code'],
+                    probability=res['probability'],
+                    matching_symptoms=res['matching_symptoms'],
+                    total_symptoms=res['total_symptoms'],
+                    confidence_score=res['confidence_score']
+                ))
+            
+            processing_time = result['processing_time_ms']
+            
+            logger.info(f"⚡ Ultra-fast diagnosis completed in {processing_time:.1f}ms")
+            
+            return DiagnosisResponse(
+                success=True,
+                results=api_results,
+                total_diseases_evaluated=result['total_diseases_evaluated'],
+                input_symptoms=valid_present_symptoms,
+                processing_time_ms=processing_time
+            )
+        
+        # Fallback to regular diagnosis
+        else:
+            logger.info("Using regular diagnosis method")
+            
+            if disease_data is None or not diseases_list:
+                raise HTTPException(status_code=503, detail="Disease data not loaded")
+            
+            # Validate symptoms exist in our dataset
+            valid_present_symptoms = [
+                symptom for symptom in request.present_symptoms
+                if symptom in symptoms_list
+            ]
+            
+            if not valid_present_symptoms:
+                raise HTTPException(
+                    status_code=400,
+                    detail="None of the provided symptoms are found in the database"
+                )
+            
+            valid_absent_symptoms = [
+                symptom for symptom in request.absent_symptoms
+                if symptom in symptoms_list
+            ]
+            
+            # Pre-filter diseases that have at least one matching symptom for better performance
+            logger.info(f"Filtering diseases with matching symptoms from {valid_present_symptoms}")
+            
+            # Get diseases that have at least one of the present symptoms
+            relevant_diseases = set()
+            for symptom in valid_present_symptoms:
+                matching_diseases = disease_data[disease_data['hpo_term'] == symptom]['disorder_name'].unique()
+                relevant_diseases.update(matching_diseases)
+            
+            # If no diseases match any symptoms, check all diseases (fallback)
+            if not relevant_diseases:
+                relevant_diseases = set(diseases_list[:100])  # Limit to top 100 for performance
+                logger.warning("No diseases found with matching symptoms, checking top 100 diseases")
+            else:
+                logger.info(f"Found {len(relevant_diseases)} diseases with matching symptoms")
+            
+            # Calculate probabilities only for relevant diseases
+            results = []
+            
+            for disease in relevant_diseases:
+                try:
+                    result = calculate_bayesian_probability(
+                        disease,
+                        valid_present_symptoms,
+                        valid_absent_symptoms
+                    )
+                    
+                    if result['probability'] > 0 or len(result['matching_symptoms']) > 0:
+                        # Get orpha code for this disease
+                        disease_info = disease_data[disease_data['disorder_name'] == disease].iloc[0]
+                        
+                        results.append(DiagnosisResult(
+                            disorder_name=disease,
+                            orpha_code=str(disease_info['orpha_code']),
+                            probability=result['probability'],
+                            matching_symptoms=result['matching_symptoms'],
+                            total_symptoms=result['total_symptoms'],
+                            confidence_score=result['confidence_score']
+                        ))
+                except Exception as e:
+                    logger.warning(f"Error calculating probability for {disease}: {e}")
+                    continue
+            
+            logger.info(f"Calculated probabilities for {len(results)} diseases")
+            
+            # Sort by probability and confidence score
+            results.sort(key=lambda x: (x.probability, x.confidence_score), reverse=True)
+            
+            # Return top N results
+            top_results = results[:request.top_n]
+            
+            processing_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+            
+            return DiagnosisResponse(
+                success=True,
+                results=top_results,
+                total_diseases_evaluated=len(results),
+                input_symptoms=valid_present_symptoms,
+                processing_time_ms=processing_time
+            )
+        
+    except Exception as e:
+        logger.error(f"Error in diagnosis: {e}")
+        raise HTTPException(status_code=500, detail=f"Diagnosis failed: {str(e)}")
+
+
+@app.post("/upload-data")
+async def upload_data(file: UploadFile = File(...)):
+    """Upload a new dataset CSV file"""
+    global disease_data, symptoms_list, diseases_list
+    
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="File must be a CSV")
+    
+    try:
+        # Save uploaded file
+        content = await file.read()
+        with open("clinical_signs_and_symptoms_in_rare_diseases.csv", "wb") as f:
+            f.write(content)
+        
+        # Reload data
+        success = load_disease_data()
+        
+        if success:
+            return {
+                "success": True,
+                "message": "Dataset uploaded and loaded successfully",
+                "total_diseases": len(diseases_list),
+                "total_symptoms": len(symptoms_list)
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to load uploaded dataset")
+            
+    except Exception as e:
+        logger.error(f"Error uploading data: {e}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+
+if __name__ == "__main__":
+    # Configuration from environment variables
+    host = os.getenv("API_HOST", "0.0.0.0")
+    port = int(os.getenv("API_PORT", "8000"))
+    workers = int(os.getenv("API_WORKERS", "1"))
+    log_level = os.getenv("LOG_LEVEL", "info").lower()
+    
+    logger.info(f"Starting server on {host}:{port}")
+    
+    uvicorn.run(
+        "main:app",
+        host=host,
+        port=port,
+        log_level=log_level,
+        reload=False
+    )

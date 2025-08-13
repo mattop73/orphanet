@@ -1,0 +1,18 @@
+# Core FastAPI and web server dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Data processing dependencies
+pandas==2.1.3
+numpy==1.25.2
+
+# Type hints and validation
+pydantic==2.5.0
+typing-extensions==4.8.0
+
+# CORS middleware (included in FastAPI but explicit for clarity)
+starlette==0.27.0
+
+# Optional: For better performance
+orjson==3.9.10
