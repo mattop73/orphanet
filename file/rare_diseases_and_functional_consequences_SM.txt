@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<JDBOR date="2024-12-03 07:01:43" version="1.3.29 / 4.1.7 [2023-08-02] (orientdb version)" copyright="Orphanet (c) 2024" dbserver="jdbc:sybase:Tds:canard.orpha.net:2020">
+  <Availability> 
+    <Licence>
+      <FullName lang="en">Creative Commons Attribution 4.0 International</FullName>
+      <ShortIdentifier>CC-BY-4.0</ShortIdentifier>
+      <LegalCode>https://creativecommons.org/licenses/by/4.0/legalcode</LegalCode>
+    </Licence>
+  </Availability>
+  <DisorderDisabilityRelevanceList count="1046">
+    <DisorderDisabilityRelevance id="5">
+      <Disorder id="230">
+        <OrphaCode>893</OrphaCode>
+        <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=893</ExpertLink>
+        <Name lang="en">WAGR syndrome</Name>
+        <DisorderType id="21401">
+          <Name lang="en">Malformation syndrome</Name>
+        </DisorderType>
+        <DisorderGroup id="36547">
+          <Name lang="en">Disorder</Name>
+        </DisorderGroup>
+        <DisabilityDisorderAssociationList count="91">
+          <DisabilityDisorderAssociation id="190181">
+            <Disability id="61">
+              <Name lang="en">Managing one's health (diet, medications, prevention, needs, assistance, monitoring)</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190182">
+            <Disability id="63">
+              <Name lang="en">Falling asleep</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190183">
+            <Disability id="64">
+              <Name lang="en">Staying asleep</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190184">
+            <Disability id="65">
+              <Name lang="en">Getting good quality sleep</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27187">
+              <Name lang="en">Acquisition delay</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190185">
+            <Disability id="66">
+              <Name lang="en">Staying awake</Name>
+            </Disability>
+            <FrequenceDisability id="27215">
+              <Name lang="en">Occasional</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27187">
+              <Name lang="en">Acquisition delay</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190186">
+            <Disability id="68">
+              <Name lang="en">Handling stress, responsabilities, emergencies and ensuring one's safety</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190187">
+            <Disability id="69">
+              <Name lang="en">Handling emotions and mood</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190188">
+            <Disability id="70">
+              <Name lang="en">Controlling one's own general behaviour</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190189">
+            <Disability id="71">
+              <Name lang="en">Controlling one's own eating behaviour</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190190">
+            <Disability id="74">
+              <Name lang="en">Moving around outside the home</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190191">
+            <Disability id="76">
+              <Name lang="en">Using transportation</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190192">
+            <Disability id="77">
+              <Name lang="en">Driving</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190193">
+            <Disability id="79">
+              <Name lang="en">Interacting with other people</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190194">
+            <Disability id="80">
+              <Name lang="en">Making/keeping friends</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190195">
+            <Disability id="81">
+              <Name lang="en">Maintaining family relationships</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190196">
+            <Disability id="82">
+              <Name lang="en">Dealing with strangers</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190197">
+            <Disability id="83">
+              <Name lang="en">Engaging in and maintaining intimate relationships</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190198">
+            <Disability id="84">
+              <Name lang="en">Engaging in sexual relationships</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190199">
+            <Disability id="87">
+              <Name lang="en">Shopping</Name>
+            </Disability>
+            <FrequenceDisability id="27208">
+              <Name lang="en">Frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190200">
+            <Disability id="88">
+              <Name lang="en">Cooking/preparing meals</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190201">
+            <Disability id="89">
+              <Name lang="en">Doing housework</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190202">
+            <Disability id="90">
+              <Name lang="en">Looking after/helping others</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190203">
+            <Disability id="92">
+              <Name lang="en">Attending preschool</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190204">
+            <Disability id="93">
+              <Name lang="en">Attending mainstream school</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190205">
+            <Disability id="94">
+              <Name lang="en">Attending school in an adapted mainstream/special environment</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190206">
+            <Disability id="95">
+              <Name lang="en">Learning a profession (vocational training/apprenticeship) in the standard environment</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27236">
+              <Name lang="en">Moderate</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190207">
+            <Disability id="96">
+              <Name lang="en">Learning a profession (vocational training/apprenticeship) in an adapted mainstream/special environment</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27271">
+              <Name lang="en">Unspecified</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190208">
+            <Disability id="97">
+              <Name lang="en">Accessing higher education</Name>
+            </Disability>
+            <FrequenceDisability id="27201">
+              <Name lang="en">Very frequent</Name>
+            </FrequenceDisability>
+            <TemporalityDisability id="27180">
+              <Name lang="en">Permanent limitation</Name>
+            </TemporalityDisability>
+            <SeverityDisability id="27250">
+              <Name lang="en">Severe</Name>
+            </SeverityDisability>
+            <LossOfAbility>n</LossOfAbility>
+            <Type>Disability</Type>
+            <Defined>y</Defined>
+          </DisabilityDisorderAssociation>
+          <DisabilityDisorderAssociation id="190209">
+            <Disability id="99">

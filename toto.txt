@@ -1,0 +1,838 @@
+🔍 XML FILE ANALYZER
+============================================================
+📁 Found 7 XML file(s) to analyze
+
+============================================================
+ANALYZING: file/Clinical signs and symptoms in rare diseases.xml.xml
+============================================================
+File Size: 47,142,615 bytes (44.96 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 865,582
+Maximum Depth: 7
+Unique Element Types: 25
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      128,696 (14.9%)
+  HPODisorderAssociation    114,961 (13.3%)
+  HPO                       114,961 (13.3%)
+  HPOId                     114,961 (13.3%)
+  HPOTerm                   114,961 (13.3%)
+  HPOFrequency              114,961 (13.3%)
+  DiagnosticCriteria        114,961 (13.3%)
+  HPODisorderSetStatus      4,283 (0.5%)
+  Disorder                  4,283 (0.5%)
+  OrphaCode                 4,283 (0.5%)
+  ExpertLink                4,283 (0.5%)
+  DisorderType              4,283 (0.5%)
+  DisorderGroup             4,283 (0.5%)
+  HPODisorderAssociationList 4,283 (0.5%)
+  Source                    4,283 (0.5%)
+  ValidationStatus          4,283 (0.5%)
+  Online                    4,283 (0.5%)
+  ValidationDate            4,283 (0.5%)
+  JDBOR                     1 (0.0%)
+  Availability              1 (0.0%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  DiagnosticCriteria:
+    └─ id: 886 occurrences
+  Disorder:
+    └─ id: 4,283 occurrences
+  DisorderGroup:
+    └─ id: 4,283 occurrences
+  DisorderType:
+    └─ id: 4,283 occurrences
+  ExpertLink:
+    └─ lang: 4,283 occurrences
+  FullName:
+    └─ lang: 1 occurrences
+  HPO:
+    └─ id: 114,961 occurrences
+  HPODisorderAssociation:
+    └─ id: 114,961 occurrences
+  HPODisorderAssociationList:
+    └─ count: 4,283 occurrences
+  HPODisorderSetStatus:
+    └─ id: 4,283 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  ExpertLink: 4,283 elements with text
+    └─ Avg length: 65.7 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  HPOId: 114,961 elements with text
+    └─ Avg length: 10.0 chars, Range: 10-10
+  HPOTerm: 114,961 elements with text
+    └─ Avg length: 19.5 chars, Range: 4-110
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  Name: 128,696 elements with text
+    └─ Avg length: 18.6 chars, Range: 4-123
+  Online: 4,283 elements with text
+    └─ Avg length: 1.0 chars, Range: 1-1
+  OrphaCode: 4,283 elements with text
+    └─ Avg length: 4.7 chars, Range: 1-6
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+  Source: 2,837 elements with text
+    └─ Avg length: 48.5 chars, Range: 12-999
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    HPODisorderSetStatusList [1 attrs]
+    │   HPODisorderSetStatus [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   Source
+    │   │   ValidationStatus [has text]
+    │   │   Online [has text]
+    │       ValidationDate [has text]
+    │   HPODisorderSetStatus [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   Source
+    │   │   ValidationStatus [has text]
+    │   │   Online [has text]
+    │       ValidationDate [has text]
+    │   HPODisorderSetStatus [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   Source
+    │   │   ValidationStatus [has text]
+    │   │   Online [has text]
+    │       ValidationDate [has text]
+    │   HPODisorderSetStatus [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   Source
+    │   │   ValidationStatus [has text]
+    │   │   Online [has text]
+    │       ValidationDate [has text]
+        HPODisorderSetStatus [1 attrs]
+        │   Disorder [1 attrs]
+        │       ... and 1 more children
+        │   Source
+        │   ValidationStatus [has text]
+        │   Online [has text]
+            ValidationDate [has text]
+        ... and 4278 more children
+
+============================================================
+ANALYZING: file/Epidiemology of rare diseases.xml
+============================================================
+File Size: 15,154,904 bytes (14.45 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 261,663
+Maximum Depth: 6
+Unique Element Types: 22
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      95,804 (36.6%)
+  Prevalence                16,119 (6.2%)
+  Source                    16,119 (6.2%)
+  PrevalenceType            16,119 (6.2%)
+  PrevalenceQualification   16,119 (6.2%)
+  PrevalenceClass           16,119 (6.2%)
+  ValMoy                    16,119 (6.2%)
+  PrevalenceGeographic      16,119 (6.2%)
+  PrevalenceValidationStatus 16,119 (6.2%)
+  Disorder                  6,150 (2.4%)
+  OrphaCode                 6,150 (2.4%)
+  ExpertLink                6,150 (2.4%)
+  DisorderType              6,150 (2.4%)
+  DisorderGroup             6,150 (2.4%)
+  PrevalenceList            6,150 (2.4%)
+  JDBOR                     1 (0.0%)
+  Availability              1 (0.0%)
+  Licence                   1 (0.0%)
+  FullName                  1 (0.0%)
+  ShortIdentifier           1 (0.0%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  Disorder:
+    └─ id: 6,150 occurrences
+  DisorderGroup:
+    └─ id: 6,150 occurrences
+  DisorderList:
+    └─ count: 1 occurrences
+  DisorderType:
+    └─ id: 6,150 occurrences
+  ExpertLink:
+    └─ lang: 6,150 occurrences
+  FullName:
+    └─ lang: 1 occurrences
+  JDBOR:
+    └─ date: 1 occurrences
+    └─ version: 1 occurrences
+    └─ copyright: 1 occurrences
+    └─ dbserver: 1 occurrences
+  Name:
+    └─ lang: 95,804 occurrences
+  Prevalence:
+    └─ id: 16,119 occurrences
+  PrevalenceClass:
+    └─ id: 12,881 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  ExpertLink: 6,150 elements with text
+    └─ Avg length: 66.0 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  Name: 95,804 elements with text
+    └─ Avg length: 13.4 chars, Range: 4-123
+  OrphaCode: 6,150 elements with text
+    └─ Avg length: 5.0 chars, Range: 1-6
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+  Source: 16,117 elements with text
+    └─ Avg length: 24.4 chars, Range: 6-162
+  ValMoy: 16,119 elements with text
+    └─ Avg length: 3.6 chars, Range: 3-7
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+        Disorder [1 attrs]
+        │   OrphaCode [has text]
+        │   ExpertLink [1 attrs] [has text]
+        │   Name [1 attrs] [has text]
+        │   DisorderType [1 attrs]
+            DisorderGroup [1 attrs]
+            ... and 1 more children
+        ... and 6145 more children
+
+============================================================
+ANALYZING: file/Genes associated with Rare diseases.xml
+============================================================
+File Size: 22,128,392 bytes (21.10 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 376,753
+Maximum Depth: 8
+Unique Element Types: 31
+
+📋 ELEMENT FREQUENCY (Top 20):
+  ExternalReference         57,298 (15.2%)
+  Source                    57,298 (15.2%)
+  Reference                 57,298 (15.2%)
+  Name                      45,434 (12.1%)
+  Synonym                   27,050 (7.2%)
+  DisorderGeneAssociation   8,300 (2.2%)
+  SourceOfValidation        8,300 (2.2%)
+  Gene                      8,300 (2.2%)
+  Symbol                    8,300 (2.2%)
+  SynonymList               8,300 (2.2%)
+  GeneType                  8,300 (2.2%)
+  ExternalReferenceList     8,300 (2.2%)
+  LocusList                 8,300 (2.2%)
+  Locus                     8,300 (2.2%)
+  GeneLocus                 8,300 (2.2%)
+  LocusKey                  8,300 (2.2%)
+  DisorderGeneAssociationType 8,300 (2.2%)
+  DisorderGeneAssociationStatus 8,300 (2.2%)
+  Disorder                  4,078 (1.1%)
+  OrphaCode                 4,078 (1.1%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  Disorder:
+    └─ id: 4,078 occurrences
+  DisorderGeneAssociationList:
+    └─ count: 4,078 occurrences
+  DisorderGeneAssociationStatus:
+    └─ id: 8,300 occurrences
+  DisorderGeneAssociationType:
+    └─ id: 8,300 occurrences
+  DisorderGroup:
+    └─ id: 4,078 occurrences
+  DisorderList:
+    └─ count: 1 occurrences
+  DisorderType:
+    └─ id: 4,078 occurrences
+  ExpertLink:
+    └─ lang: 4,078 occurrences
+  ExternalReference:
+    └─ id: 57,298 occurrences
+  ExternalReferenceList:
+    └─ count: 8,300 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  ExpertLink: 4,078 elements with text
+    └─ Avg length: 66.2 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  GeneLocus: 8,300 elements with text
+    └─ Avg length: 6.7 chars, Range: 4-19
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  LocusKey: 8,300 elements with text
+    └─ Avg length: 1.0 chars, Range: 1-1
+  Name: 45,434 elements with text
+    └─ Avg length: 24.9 chars, Range: 4-145
+  OrphaCode: 4,078 elements with text
+    └─ Avg length: 5.2 chars, Range: 1-6
+  Reference: 57,098 elements with text
+    └─ Avg length: 6.7 chars, Range: 1-15
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+  Source: 57,298 elements with text
+    └─ Avg length: 6.6 chars, Range: 4-9
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 1 more children
+        Disorder [1 attrs]
+        │   OrphaCode [has text]
+        │   ExpertLink [1 attrs] [has text]
+        │   Name [1 attrs] [has text]
+        │   DisorderType [1 attrs]
+            DisorderGroup [1 attrs]
+            ... and 1 more children
+        ... and 4073 more children
+
+============================================================
+ANALYZING: file/Linearisation of rare diseases.xml
+============================================================
+File Size: 12,365,621 bytes (11.79 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 185,469
+Maximum Depth: 6
+Unique Element Types: 16
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      48,796 (26.3%)
+  OrphaCode                 29,290 (15.8%)
+  DisorderDisorderAssociation 19,506 (10.5%)
+  TargetDisorder            19,506 (10.5%)
+  RootDisorder              19,506 (10.5%)
+  DisorderDisorderAssociationType 19,506 (10.5%)
+  Disorder                  9,784 (5.3%)
+  ExpertLink                9,784 (5.3%)
+  DisorderDisorderAssociationList 9,784 (5.3%)
+  JDBOR                     1 (0.0%)
+  Availability              1 (0.0%)
+  Licence                   1 (0.0%)
+  FullName                  1 (0.0%)
+  ShortIdentifier           1 (0.0%)
+  LegalCode                 1 (0.0%)
+  DisorderList              1 (0.0%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  Disorder:
+    └─ id: 9,784 occurrences
+  DisorderDisorderAssociationList:
+    └─ count: 9,784 occurrences
+  DisorderDisorderAssociationType:
+    └─ id: 19,506 occurrences
+  DisorderList:
+    └─ count: 1 occurrences
+  ExpertLink:
+    └─ lang: 9,784 occurrences
+  FullName:
+    └─ lang: 1 occurrences
+  JDBOR:
+    └─ date: 1 occurrences
+    └─ version: 1 occurrences
+    └─ copyright: 1 occurrences
+    └─ dbserver: 1 occurrences
+  Name:
+    └─ lang: 48,796 occurrences
+  RootDisorder:
+    └─ id: 19,506 occurrences
+    └─ cycle: 9,753 occurrences
+  TargetDisorder:
+    └─ id: 19,506 occurrences
+    └─ cycle: 9,753 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  ExpertLink: 9,784 elements with text
+    └─ Avg length: 66.2 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  Name: 48,796 elements with text
+    └─ Avg length: 29.4 chars, Range: 4-145
+  OrphaCode: 29,290 elements with text
+    └─ Avg length: 5.2 chars, Range: 1-6
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │       DisorderDisorderAssociationList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │       DisorderDisorderAssociationList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │       DisorderDisorderAssociationList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │       DisorderDisorderAssociationList [1 attrs]
+        Disorder [1 attrs]
+        │   OrphaCode [has text]
+        │   ExpertLink [1 attrs] [has text]
+        │   Name [1 attrs] [has text]
+            DisorderDisorderAssociationList [1 attrs]
+        ... and 9779 more children
+
+============================================================
+ANALYZING: file/Rare disease alignment with terminology.xml
+============================================================
+File Size: 42,085,973 bytes (40.14 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 608,030
+Maximum Depth: 8
+Unique Element Types: 39
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      139,714 (23.0%)
+  ExternalReference         40,347 (6.6%)
+  Source                    40,347 (6.6%)
+  Reference                 40,347 (6.6%)
+  DisorderMappingRelation   40,347 (6.6%)
+  DisorderMappingICDRelation 40,347 (6.6%)
+  DisorderMappingValidationStatus 40,347 (6.6%)
+  Synonym                   14,459 (2.4%)
+  OrphaCode                 13,475 (2.2%)
+  DisorderFlag              13,315 (2.2%)
+  Value                     13,315 (2.2%)
+  Label                     13,315 (2.2%)
+  Disorder                  11,074 (1.8%)
+  ExpertLink                11,074 (1.8%)
+  DisorderFlagList          11,074 (1.8%)
+  SynonymList               11,074 (1.8%)
+  DisorderType              11,074 (1.8%)
+  DisorderGroup             11,074 (1.8%)
+  ExternalReferenceList     11,074 (1.8%)
+  DisorderDisorderAssociationList 11,074 (1.8%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  Disorder:
+    └─ id: 11,074 occurrences
+  DisorderDisorderAssociationList:
+    └─ count: 11,074 occurrences
+  DisorderDisorderAssociationType:
+    └─ id: 2,401 occurrences
+  DisorderFlag:
+    └─ id: 13,315 occurrences
+  DisorderFlagList:
+    └─ count: 11,074 occurrences
+  DisorderGroup:
+    └─ id: 11,074 occurrences
+  DisorderList:
+    └─ count: 1 occurrences
+  DisorderMappingICDRelation:
+    └─ id: 14,136 occurrences
+  DisorderMappingRelation:
+    └─ id: 40,347 occurrences
+  DisorderMappingValidationStatus:
+    └─ id: 40,347 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  Contents: 6,860 elements with text
+    └─ Avg length: 387.5 chars, Range: 44-1404
+  ExpertLink: 11,074 elements with text
+    └─ Avg length: 66.2 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  Info: 3,696 elements with text
+    └─ Avg length: 156.2 chars, Range: 40-394
+  Label: 3,220 elements with text
+    └─ Avg length: 12.9 chars, Range: 8-26
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  Name: 139,714 elements with text
+    └─ Avg length: 35.1 chars, Range: 4-139
+  OrphaCode: 13,475 elements with text
+    └─ Avg length: 5.2 chars, Range: 1-6
+  Reference: 40,347 elements with text
+    └─ Avg length: 6.2 chars, Range: 1-10
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderFlagList [1 attrs]
+    │       SynonymList [1 attrs]
+    │       ... and 5 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderFlagList [1 attrs]
+    │       SynonymList [1 attrs]
+    │       ... and 5 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderFlagList [1 attrs]
+    │       SynonymList [1 attrs]
+    │       ... and 5 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderFlagList [1 attrs]
+    │       SynonymList [1 attrs]
+    │       ... and 5 more children
+        Disorder [1 attrs]
+        │   OrphaCode [has text]
+        │   ExpertLink [1 attrs] [has text]
+        │   Name [1 attrs] [has text]
+        │   DisorderFlagList [1 attrs]
+            SynonymList [1 attrs]
+            ... and 5 more children
+        ... and 11069 more children
+
+============================================================
+ANALYZING: file/Rare diseases and functional consequences.xml
+============================================================
+File Size: 26,006,623 bytes (24.80 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 432,630
+Maximum Depth: 7
+Unique Element Types: 30
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      138,779 (32.1%)
+  DisabilityDisorderAssociation 34,900 (8.1%)
+  Disability                34,900 (8.1%)
+  FrequenceDisability       34,900 (8.1%)
+  TemporalityDisability     34,900 (8.1%)
+  SeverityDisability        34,900 (8.1%)
+  LossOfAbility             34,900 (8.1%)
+  Type                      34,900 (8.1%)
+  Defined                   34,900 (8.1%)
+  DisorderDisabilityRelevance 1,046 (0.2%)
+  Disorder                  1,046 (0.2%)
+  OrphaCode                 1,046 (0.2%)
+  ExpertLink                1,046 (0.2%)
+  DisorderType              1,046 (0.2%)
+  DisorderGroup             1,046 (0.2%)
+  DisabilityDisorderAssociationList 1,046 (0.2%)
+  SourceOfValidation        1,046 (0.2%)
+  SpecificManagement        1,046 (0.2%)
+  Online                    1,046 (0.2%)
+  AnnotationDate            1,046 (0.2%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  Disability:
+    └─ id: 34,900 occurrences
+  DisabilityCategory:
+    └─ id: 1,046 occurrences
+  DisabilityDisorderAssociation:
+    └─ id: 34,900 occurrences
+  DisabilityDisorderAssociationList:
+    └─ count: 1,046 occurrences
+  Disorder:
+    └─ id: 1,046 occurrences
+  DisorderDisabilityRelevance:
+    └─ id: 1,046 occurrences
+  DisorderDisabilityRelevanceList:
+    └─ count: 1 occurrences
+  DisorderGroup:
+    └─ id: 1,046 occurrences
+  DisorderType:
+    └─ id: 1,046 occurrences
+  ExpertLink:
+    └─ lang: 1,046 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  AnnotationDate: 1,046 elements with text
+    └─ Avg length: 21.0 chars, Range: 21-21
+  Defined: 34,900 elements with text
+    └─ Avg length: 1.0 chars, Range: 1-1
+  ExpertLink: 1,046 elements with text
+    └─ Avg length: 65.6 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  LossOfAbility: 34,900 elements with text
+    └─ Avg length: 1.0 chars, Range: 1-1
+  Name: 138,779 elements with text
+    └─ Avg length: 16.3 chars, Range: 3-115
+  Online: 1,046 elements with text
+    └─ Avg length: 1.0 chars, Range: 1-1
+  OrphaCode: 1,046 elements with text
+    └─ Avg length: 4.6 chars, Range: 1-6
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderDisabilityRelevanceList [1 attrs]
+    │   DisorderDisabilityRelevance [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   SourceOfValidation [has text]
+    │   │   SpecificManagement [has text]
+    │   │   Online [has text]
+    │       AnnotationDate [has text]
+    │       ... and 3 more children
+    │   DisorderDisabilityRelevance [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   SourceOfValidation [has text]
+    │   │   SpecificManagement [has text]
+    │   │   Online [has text]
+    │       AnnotationDate [has text]
+    │       ... and 3 more children
+    │   DisorderDisabilityRelevance [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   SourceOfValidation [has text]
+    │   │   SpecificManagement [has text]
+    │   │   Online [has text]
+    │       AnnotationDate [has text]
+    │       ... and 3 more children
+    │   DisorderDisabilityRelevance [1 attrs]
+    │   │   Disorder [1 attrs]
+    │   │       ... and 1 more children
+    │   │   SourceOfValidation [has text]
+    │   │   SpecificManagement [has text]
+    │   │   Online [has text]
+    │       AnnotationDate [has text]
+    │       ... and 3 more children
+        DisorderDisabilityRelevance [1 attrs]
+        │   Disorder [1 attrs]
+        │       ... and 1 more children
+        │   SourceOfValidation [has text]
+        │   SpecificManagement [has text]
+        │   Online [has text]
+            AnnotationDate [has text]
+            ... and 3 more children
+        ... and 1041 more children
+
+============================================================
+ANALYZING: file/natural history of rare diseases.xml
+============================================================
+File Size: 6,215,727 bytes (5.93 MB)
+
+📊 BASIC STRUCTURE:
+Root Element: JDBOR
+Total Elements: 106,119
+Maximum Depth: 5
+Unique Element Types: 17
+
+📋 ELEMENT FREQUENCY (Top 20):
+  Name                      39,066 (36.8%)
+  AverageAgeOfOnset         11,402 (10.7%)
+  Disorder                  6,995 (6.6%)
+  OrphaCode                 6,995 (6.6%)
+  ExpertLink                6,995 (6.6%)
+  DisorderType              6,995 (6.6%)
+  DisorderGroup             6,995 (6.6%)
+  AverageAgeOfOnsetList     6,995 (6.6%)
+  TypeOfInheritanceList     6,995 (6.6%)
+  TypeOfInheritance         6,679 (6.3%)
+  JDBOR                     1 (0.0%)
+  Availability              1 (0.0%)
+  Licence                   1 (0.0%)
+  FullName                  1 (0.0%)
+  ShortIdentifier           1 (0.0%)
+  LegalCode                 1 (0.0%)
+  DisorderList              1 (0.0%)
+
+🏷️  ATTRIBUTES ANALYSIS:
+  AverageAgeOfOnset:
+    └─ id: 11,402 occurrences
+  AverageAgeOfOnsetList:
+    └─ count: 6,995 occurrences
+  Disorder:
+    └─ id: 6,995 occurrences
+  DisorderGroup:
+    └─ id: 6,995 occurrences
+  DisorderList:
+    └─ count: 1 occurrences
+  DisorderType:
+    └─ id: 6,995 occurrences
+  ExpertLink:
+    └─ lang: 6,995 occurrences
+  FullName:
+    └─ lang: 1 occurrences
+  JDBOR:
+    └─ date: 1 occurrences
+    └─ version: 1 occurrences
+    └─ copyright: 1 occurrences
+    └─ dbserver: 1 occurrences
+  Name:
+    └─ lang: 39,066 occurrences
+
+📝 TEXT CONTENT ANALYSIS:
+  ExpertLink: 6,995 elements with text
+    └─ Avg length: 66.0 chars, Range: 62-67
+  FullName: 1 elements with text
+    └─ Avg length: 46.0 chars, Range: 46-46
+  LegalCode: 1 elements with text
+    └─ Avg length: 53.0 chars, Range: 53-53
+  Name: 39,066 elements with text
+    └─ Avg length: 16.2 chars, Range: 4-139
+  OrphaCode: 6,995 elements with text
+    └─ Avg length: 5.0 chars, Range: 1-6
+  ShortIdentifier: 1 elements with text
+    └─ Avg length: 9.0 chars, Range: 9-9
+
+🌳 STRUCTURE SAMPLE:
+JDBOR [4 attrs]
+│   Availability
+│       Licence
+│       │   FullName [1 attrs] [has text]
+│       │   ShortIdentifier [has text]
+│           LegalCode [has text]
+    DisorderList [1 attrs]
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 2 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 2 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 2 more children
+    │   Disorder [1 attrs]
+    │   │   OrphaCode [has text]
+    │   │   ExpertLink [1 attrs] [has text]
+    │   │   Name [1 attrs] [has text]
+    │   │   DisorderType [1 attrs]
+    │       DisorderGroup [1 attrs]
+    │       ... and 2 more children
+        Disorder [1 attrs]
+        │   OrphaCode [has text]
+        │   ExpertLink [1 attrs] [has text]
+        │   Name [1 attrs] [has text]
+        │   DisorderType [1 attrs]
+            DisorderGroup [1 attrs]
+            ... and 2 more children
+        ... and 6990 more children
+
+✅ Analysis complete!

@@ -329,8 +329,9 @@ async def get_api_info():
 # Railway deployment entry point
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Starting Railway API on port {port}")
     uvicorn.run(
-        "main_railway:app",
+        app,
         host="0.0.0.0",
         port=port,
         log_level="info"

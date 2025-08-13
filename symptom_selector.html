@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Symptom Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .selected-symptoms {
+            margin-bottom: 30px;
+        }
+
+        .selected-symptoms h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .symptom-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+            padding: 15px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .symptom-tag {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .symptom-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .symptom-tag .remove:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .empty-state {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2e7d32;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Simple Symptom Selector</h1>
+        
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="search-input" 
+                class="search-input" 
+                placeholder="Type to search symptoms (e.g., 'seizure', 'fever', 'pain')..."
+                autocomplete="off"
+            >
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <span id="available-count">Available symptoms: Loading...</span>
+            <span id="selected-count">Selected: 0</span>
+        </div>
+
+        <div class="selected-symptoms">
+            <h2>Selected Symptoms:</h2>
+            <div id="symptom-list" class="symptom-list">
+                <div class="empty-state">No symptoms selected. Start typing to search and click to select.</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="diagnose-btn" class="btn btn-primary" disabled onclick="diagnose()">
+                🧠 Get Diagnosis
+            </button>
+            <button id="clear-btn" class="btn btn-secondary" onclick="clearAll()">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <div id="results" style="margin-top: 30px;">
+            <div style="background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 6px; padding: 12px; margin-bottom: 20px; font-size: 0.9em; color: #0c5460; display: none;" id="clickable-tip">
+                💡 <strong>Tip:</strong> Click on any disease result to view detailed information on the official Orphanet database
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allSymptoms = [];
+        let selectedSymptoms = [];
+        const API_BASE = 'http://localhost:8000';
+
+        // DOM elements
+        const searchInput = document.getElementById('search-input');
+        const suggestions = document.getElementById('suggestions');
+        const symptomList = document.getElementById('symptom-list');
+        const diagnoseBtn = document.getElementById('diagnose-btn');
+        const stats = document.getElementById('stats');
+        const availableCount = document.getElementById('available-count');
+        const selectedCount = document.getElementById('selected-count');
+        const results = document.getElementById('results');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadSymptoms();
+            setupEventListeners();
+        });
+
+        // Load all symptoms from API
+        async function loadSymptoms() {
+            try {
+                showLoading('Loading symptoms...');
+                
+                // First try to load a small sample to test the connection
+                console.log('Testing API connection...');
+                let response = await fetch(`${API_BASE}/symptoms?limit=10`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                // If that works, load more symptoms
+                console.log('Loading all symptoms...');
+                response = await fetch(`${API_BASE}/symptoms?limit=9000`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                const data = await response.json();
+                allSymptoms = data.symptoms || [];
+                
+                availableCount.textContent = `Available symptoms: ${allSymptoms.length}`;
+                stats.style.display = 'flex';
+                
+                console.log(`Successfully loaded ${allSymptoms.length} symptoms`);
+                console.log('First 5 symptoms:', allSymptoms.slice(0, 5));
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading symptoms:', error);
+                showError(`Failed to load symptoms: ${error.message}<br><br>
+                    <strong>Troubleshooting:</strong><br>
+                    1. Make sure the API server is running: <code>python3 start_selector.py</code><br>
+                    2. Check that the server started successfully<br>
+                    3. Verify the CSV data file exists in the file/ directory`);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', handleSearch);
+            searchInput.addEventListener('focus', handleSearch);
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+                    hideSuggestions();
+                }
+            });
+        }
+
+        // Handle search input
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+
+            // Filter symptoms that contain the query and aren't already selected
+            const filtered = allSymptoms.filter(symptom => 
+                symptom.toLowerCase().includes(query) &&
+                !selectedSymptoms.includes(symptom)
+            ).slice(0, 20); // Limit to 20 suggestions
+
+            if (filtered.length > 0) {
+                showSuggestions(filtered);
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        // Show suggestions
+        function showSuggestions(symptoms) {
+            suggestions.innerHTML = symptoms.map(symptom => 
+                `<div class="suggestion-item" onclick="selectSymptom('${symptom.replace(/'/g, "\\'")}')">
+                    ${highlightMatch(symptom, searchInput.value)}
+                </div>`
+            ).join('');
+            
+            suggestions.style.display = 'block';
+        }
+
+        // Hide suggestions
+        function hideSuggestions() {
+            suggestions.style.display = 'none';
+        }
+
+        // Highlight matching text
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<strong>$1</strong>');
+        }
+
+        // Select a symptom
+        function selectSymptom(symptom) {
+            if (!selectedSymptoms.includes(symptom)) {
+                selectedSymptoms.push(symptom);
+                updateSymptomDisplay();
+                searchInput.value = '';
+                hideSuggestions();
+                searchInput.focus();
+            }
+        }
+
+        // Remove a symptom
+        function removeSymptom(symptom) {
+            selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+            updateSymptomDisplay();
+        }
+
+        // Update symptom display
+        function updateSymptomDisplay() {
+            if (selectedSymptoms.length === 0) {
+                symptomList.innerHTML = '<div class="empty-state">No symptoms selected. Start typing to search and click to select.</div>';
+            } else {
+                symptomList.innerHTML = selectedSymptoms.map(symptom => 
+                    `<div class="symptom-tag">
+                        ${symptom}
+                        <span class="remove" onclick="removeSymptom('${symptom.replace(/'/g, "\\'")}')">×</span>
+                    </div>`
+                ).join('');
+            }
+
+            // Update stats and button state
+            selectedCount.textContent = `Selected: ${selectedSymptoms.length}`;
+            diagnoseBtn.disabled = selectedSymptoms.length === 0;
+            
+            // Clear results when symptoms change
+            results.innerHTML = '';
+        }
+
+        // Clear all symptoms
+        function clearAll() {
+            selectedSymptoms = [];
+            updateSymptomDisplay();
+            searchInput.focus();
+        }
+
+        // Perform diagnosis
+        async function diagnose() {
+            if (selectedSymptoms.length === 0) return;
+
+            try {
+                showLoading('Analyzing symptoms...');
+                
+                const requestData = {
+                    present_symptoms: selectedSymptoms,
+                    absent_symptoms: [],
+                    top_n: 10
+                };
+
+                const response = await fetch(`${API_BASE}/diagnose`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Diagnosis error:', error);
+                showError(`Diagnosis failed: ${error.message}`);
+            }
+        }
+
+        // Display diagnosis results
+        function displayResults(data) {
+            if (!data.success || data.results.length === 0) {
+                results.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                        <p>No matching diseases found for the selected symptoms.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const resultsHtml = `
+                <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #333; margin-bottom: 10px;">🎯 Diagnosis Results</h3>
+                    <p style="color: #666; font-size: 14px;">
+                        Found ${data.results.length} matches from ${data.total_diseases_evaluated} diseases 
+                        (processed in ${Math.round(data.processing_time_ms)}ms)
+                    </p>
+                </div>
+                
+                ${data.results.slice(0, 5).map((result, index) => {
+                    const orphaUrl = `https://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=EN&Expert=${result.orpha_code}`;
+                    return `
+                    <a href="${orphaUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+                        <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;" 
+                             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.15)'"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                <div>
+                                    <h4 style="color: #333; margin: 0; font-size: 1.1em; position: relative;">
+                                        ${result.disorder_name}
+                                        <span style="font-size: 0.7em; opacity: 0.7; margin-left: 8px;">🔗</span>
+                                    </h4>
+                                    <p style="color: #666; font-size: 0.9em; margin: 5px 0;">Orpha Code: ${result.orpha_code}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">${(result.probability * 100).toFixed(2)}%</div>
+                                    <div style="font-size: 0.8em; color: #666;">Confidence: ${(result.confidence_score * 100).toFixed(1)}%</div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #f5f5f5; border-radius: 4px; height: 8px; margin: 10px 0;">
+                                <div style="background: #4CAF50; height: 100%; border-radius: 4px; width: ${result.probability * 100}%; transition: width 0.8s ease;"></div>
+                            </div>
+                            
+                            <div style="font-size: 0.9em; color: #555;">
+                                <strong>Matching symptoms (${result.matching_symptoms.length}/${result.total_symptoms}):</strong><br>
+                                ${result.matching_symptoms.join(', ')}
+                            </div>
+                            
+                            <div style="font-size: 0.8em; color: #888; margin-top: 8px; font-style: italic;">
+                                Click to view detailed information on Orphanet →
+                            </div>
+                        </div>
+                    </a>
+                `;
+                }).join('')}
+            `;
+
+            results.innerHTML = resultsHtml;
+            
+            // Show the clickable tip
+            const tip = document.getElementById('clickable-tip');
+            if (tip) {
+                tip.style.display = 'block';
+            }
+        }
+
+        // Show loading state
+        function showLoading(message) {
+            results.innerHTML = `
+                <div class="loading" style="padding: 20px; text-align: center;">
+                    <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+                    ${message}
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            if (results.innerHTML.includes('Loading') || results.innerHTML.includes('loading')) {
+                results.innerHTML = '';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            results.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

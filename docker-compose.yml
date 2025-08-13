@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  bayesian-diagnosis-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./file/clinical_signs_and_symptoms_in_rare_diseases.csv:/app/clinical_signs_and_symptoms_in_rare_diseases.csv:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orphanet Rare Disease Explorer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        #searchInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        #searchInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+        }
+        
+        .search-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+        }
+        
+        .filter-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tag {
+            padding: 8px 15px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-tag:hover {
+            background: #764ba2;
+            color: white;
+            border-color: #764ba2;
+        }
+        
+        .filter-tag.active {
+            background: #764ba2;
+            color: white;
+            border-color: #764ba2;
+        }
+        
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        .results-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .result-item {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .result-item:hover {
+            border-color: #764ba2;
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.1);
+        }
+        
+        .result-item.selected {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        }
+        
+        .result-item h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .result-item .meta {
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .result-item .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+        
+        .detail-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .detail-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .detail-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .detail-header .orpha-code {
+            color: #764ba2;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .tab:hover {
+            color: #764ba2;
+        }
+        
+        .tab.active {
+            color: #764ba2;
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #764ba2;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .info-card {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .info-card h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-card p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .symptom-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .symptom-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .symptom-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .frequency-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .frequency-very-frequent {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .frequency-frequent {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .frequency-occasional {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .gene-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .gene-card {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .gene-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .gene-symbol {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .gene-location {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
+                    <path d="M2 17L12 22L22 17"></path>
+                    <path d="M2 12L12 17L22 12"></path>
+                </svg>
+                Orphanet Rare Disease Explorer
+            </h1>
+            <div class="subtitle">Comprehensive database of rare diseases and genetic disorders</div>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by disease name, ORPHA code, gene symbol, or symptom...">
+                <button class="search-btn" onclick="performSearch()">Search</button>
+            </div>
+            <div class="filter-tags">
+                <span class="filter-tag" data-type="disease">Diseases</span>
+                <span class="filter-tag" data-type="gene">Genes</span>
+                <span class="filter-tag" data-type="symptom">Symptoms</span>
+                <span class="filter-tag active" data-type="all">All</span>
+            </div>
+        </div>
+        
+        <div class="stats-container" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalDisorders">0</div>
+                <div class="stat-label">Total Disorders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalGenes">0</div>
+                <div class="stat-label">Associated Genes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSymptoms">0</div>
+                <div class="stat-label">Clinical Features</div>
+            </div>
+        </div>
+        
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-list" id="resultsList">
+                <!-- Results will be populated here -->
+            </div>
+            
+            <div class="detail-panel" id="detailPanel">
+                <div class="loading">Select a disorder to view details</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration - Replace with your Supabase credentials
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentSearchType = 'all';
+        let currentDisorder = null;
+        
+        // Initialize the app
+        async function init() {
+            // Load statistics
+            await loadStatistics();
+            
+            // Set up event listeners
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Filter tag listeners
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentSearchType = e.target.dataset.type;
+                });
+            });
+        }
+        
+        async function loadStatistics() {
+            try {
+                // Get total disorders
+                const { count: disorderCount } = await supabase
+                    .from('disorders')
+                    .select('*', { count: 'exact', head: true });
+                
+                // Get total genes
+                const { count: geneCount } = await supabase
+                    .from('genes')
+                    .select('*', { count: 'exact', head: true });
+                
+                // Get total HPO terms
+                const { count: hpoCount } = await supabase
+                    .from('hpo_terms')
+                    .select('*', { count: 'exact', head: true });
+                
+                document.getElementById('totalDisorders').textContent = disorderCount || 0;
+                document.getElementById('totalGenes').textContent = geneCount || 0;
+                document.getElementById('totalSymptoms').textContent = hpoCount || 0;
+                document.getElementById('statsContainer').style.display = 'grid';
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+        
+        async function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            document.getElementById('resultsSection').style.display = 'grid';
+            document.getElementById('resultsList').innerHTML = '<div class="loading">Searching</div>';
+            
+            try {
+                let results = [];
+                
+                if (currentSearchType === 'all' || currentSearchType === 'disease') {
+                    // Search disorders
+                    const { data: disorders, error } = await supabase
+                        .from('disorders')
+                        .select('*')
+                        .or(`name.ilike.%${searchTerm}%,orpha_code.eq.${searchTerm}`)
+                        .limit(20);
+                    
+                    if (!error && disorders) {
+                        results = results.concat(disorders.map(d => ({ ...d, type: 'disorder' })));
+                    }
+                }
+                
+                if (currentSearchType === 'all' || currentSearchType === 'gene') {
+                    // Search genes
+                    const { data: genes, error } = await supabase
+                        .from('disorder_genes_view')
+                        .select('*')
+                        .ilike('gene_symbol', `%${searchTerm}%`)
+                        .limit(20);
+                    
+                    if (!error && genes) {
+                        // Group by disorder
+                        const disorderIds = [...new Set(genes.map(g => g.orpha_code))];
+                        for (const id of disorderIds) {
+                            const { data: disorder } = await supabase
+                                .from('disorders')
+                                .select('*')
+                                .eq('orpha_code', id)
+                                .single();
+                            
+                            if (disorder) {
+                                results.push({ ...disorder, type: 'disorder', matchedGene: searchTerm });
+                            }
+                        }
+                    }
+                }
+                
+                if (currentSearchType === 'all' || currentSearchType === 'symptom') {
+                    // Search symptoms
+                    const { data: symptoms, error } = await supabase
+                        .from('disorder_symptoms_view')
+                        .select('*')
+                        .ilike('symptom', `%${searchTerm}%`)
+                        .limit(20);
+                    
+                    if (!error && symptoms) {
+                        // Group by disorder
+                        const disorderIds = [...new Set(symptoms.map(s => s.orpha_code))];
+                        for (const id of disorderIds) {
+                            const { data: disorder } = await supabase
+                                .from('disorders')
+                                .select('*')
+                                .eq('orpha_code', id)
+                                .single();
+                            
+                            if (disorder) {
+                                results.push({ ...disorder, type: 'disorder', matchedSymptom: searchTerm });
+                            }
+                        }
+                    }
+                }
+                
+                displayResults(results);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                document.getElementById('resultsList').innerHTML = '<div class="error-message">Error performing search. Please try again.</div>';
+            }
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('resultsList');
+            
+            if (!results || results.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No results found</div>';
+                return;
+            }
+            
+            // Remove duplicates
+            const uniqueResults = Array.from(new Map(results.map(r => [r.orpha_code, r])).values());
+            
+            resultsDiv.innerHTML = uniqueResults.map(result => `
+                <div class="result-item" onclick="loadDisorderDetails('${result.orpha_code}', this)">
+                    <h3>${result.name}</h3>
+                    <div class="meta">
+                        <span class="badge">ORPHA:${result.orpha_code}</span>
+                        ${result.disorder_type ? `<span class="badge">${result.disorder_type}</span>` : ''}
+                        ${result.matchedGene ? `<span class="badge">Gene: ${result.matchedGene}</span>` : ''}
+                        ${result.matchedSymptom ? `<span class="badge">Symptom match</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadDisorderDetails(orphaCode, element) {
+            // Update selection
+            document.querySelectorAll('.result-item').forEach(item => item.classList.remove('selected'));
+            if (element) element.classList.add('selected');
+            
+            const detailPanel = document.getElementById('detailPanel');
+            detailPanel.innerHTML = '<div class="loading">Loading disorder details</div>';
+            
+            try {
+                // Load disorder details
+                const { data: disorder, error } = await supabase
+                    .from('disorder_complete')
+                    .select('*')
+                    .eq('orpha_code', orphaCode)
+                    .single();
+                
+                if (error) throw error;
+                
+                currentDisorder = disorder;
+                
+                // Load additional details
+                const [genes, symptoms, prevalence, texts] = await Promise.all([
+                    loadGenes(disorder.id),
+                    loadSymptoms(disorder.id),
+                    loadPrevalence(disorder.id),
+                    loadTexts(disorder.id)
+                ]);
+                
+                displayDisorderDetails(disorder, genes, symptoms, prevalence, texts);
+                
+            } catch (error) {
+                console.error('Error loading disorder details:', error);
+                detailPanel.innerHTML = '<div class="error-message">Error loading disorder details</div>';
+            }
+        }
+        
+        async function loadGenes(disorderId) {
+            const { data, error } = await supabase
+                .from('disorder_gene_associations')
+                .select(`
+                    *,
+                    genes (*)
+                `)
+                .eq('disorder_id', disorderId);
+            
+            return error ? [] : data;
+        }
+        
+        async function loadSymptoms(disorderId) {
+            const { data, error } = await supabase
+                .from('disorder_hpo_associations')
+                .select(`
+                    *,
+                    hpo_terms (*)
+                `)
+                .eq('disorder_id', disorderId)
+                .order('frequency_category');
+            
+            return error ? [] : data;
+        }
+        
+        async function loadPrevalence(disorderId) {
+            const { data, error } = await supabase
+                .from('prevalence_data')
+                .select('*')
+                .eq('disorder_id', disorderId);
+            
+            return error ? [] : data;
+        }
+        
+        async function loadTexts(disorderId) {
+            const { data, error } = await supabase
+                .from('disorder_texts')
+                .select('*')
+                .eq('disorder_id', disorderId);
+            
+            return error ? [] : data;
+        }
+        
+        function displayDisorderDetails(disorder, genes, symptoms, prevalence, texts) {
+            const detailPanel = document.getElementById('detailPanel');
+            
+            const definition = texts.find(t => t.text_type === 'definition')?.content || 'No definition available';
+            
+            detailPanel.innerHTML = `
+                <div class="detail-header">
+                    <h2>${disorder.name}</h2>
+                    <div class="orpha-code">ORPHA:${disorder.orpha_code}</div>
+                    ${disorder.disorder_type ? `<div class="meta">${disorder.disorder_type}</div>` : ''}
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('overview', this)">Overview</button>
+                    <button class="tab" onclick="switchTab('clinical', this)">Clinical Features</button>
+                    <button class="tab" onclick="switchTab('genetics', this)">Genetics</button>
+                    <button class="tab" onclick="switchTab('epidemiology', this)">Epidemiology</button>
+                </div>
+                
+                <div class="tab-content active" id="overview-tab">
+                    <div class="info-card">
+                        <h4>Definition</h4>
+                        <p>${definition}</p>
+                    </div>
+                    
+                    <div class="info-grid">
+                        ${disorder.age_of_onset && disorder.age_of_onset.length > 0 ? `
+                            <div class="info-card">
+                                <h4>Age of Onset</h4>
+                                <p>${disorder.age_of_onset.join(', ')}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${disorder.inheritance_types && disorder.inheritance_types.length > 0 ? `
+                            <div class="info-card">
+                                <h4>Inheritance</h4>
+                                <p>${disorder.inheritance_types.join(', ')}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${disorder.synonyms && disorder.synonyms.length > 0 ? `
+                            <div class="info-card">
+                                <h4>Synonyms</h4>
+                                <p>${disorder.synonyms.slice(0, 3).join(', ')}${disorder.synonyms.length > 3 ? '...' : ''}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Statistics</h4>
+                            <p>Associated Genes: ${disorder.gene_count || 0}</p>
+                            <p>Clinical Features: ${disorder.symptom_count || 0}</p>
+                        </div>
+                        
+                        ${disorder.expert_link ? `
+                            <div class="info-card">
+                                <h4>More Information</h4>
+                                <p><a href="${disorder.expert_link}" target="_blank" style="color: #764ba2;">View on Orphanet →</a></p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="clinical-tab">
+                    <h3 style="margin-bottom: 20px;">Clinical Features (HPO Terms)</h3>
+                    ${symptoms.length > 0 ? `
+                        <div class="symptom-list">
+                            ${symptoms.map(s => `
+                                <div class="symptom-item">
+                                    <div>
+                                        <div class="symptom-name">${s.hpo_terms.term}</div>
+                                        <div style="color: #888; font-size: 12px; margin-top: 5px;">${s.hpo_terms.hpo_id}</div>
+                                    </div>
+                                    ${s.frequency_category ? `
+                                        <span class="frequency-badge frequency-${s.frequency_category.toLowerCase().replace(' ', '-')}">
+                                            ${s.frequency_category}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p>No clinical features recorded</p>'}
+                </div>
+                
+                <div class="tab-content" id="genetics-tab">
+                    <h3 style="margin-bottom: 20px;">Associated Genes</h3>
+                    ${genes.length > 0 ? `
+                        <div class="gene-grid">
+                            ${genes.map(g => `
+                                <div class="gene-card">
+                                    <div class="gene-symbol">${g.genes.gene_symbol}</div>
+                                    <div class="gene-location">${g.genes.chromosomal_location || 'Location unknown'}</div>
+                                    <div style="font-size: 11px; margin-top: 10px; opacity: 0.9;">
+                                        ${g.association_type || 'Associated'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p>No genetic associations recorded</p>'}
+                </div>
+                
+                <div class="tab-content" id="epidemiology-tab">
+                    <h3 style="margin-bottom: 20px;">Epidemiological Data</h3>
+                    ${prevalence.length > 0 ? `
+                        <div class="info-grid">
+                            ${prevalence.map(p => `
+                                <div class="info-card">
+                                    <h4>${p.prevalence_type || 'Prevalence'}</h4>
+                                    <p>
+                                        ${p.prevalence_class || 'Unknown'}<br>
+                                        ${p.val_moy > 0 ? `Value: ${p.val_moy}<br>` : ''}
+                                        ${p.geographic_area ? `Region: ${p.geographic_area}<br>` : ''}
+                                        ${p.source ? `<small style="color: #888;">Source: ${p.source}</small>` : ''}
+                                    </p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p>No epidemiological data available</p>'}
+                </div>
+            `;
+        }
+        
+        function switchTab(tabName, element) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

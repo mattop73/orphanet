@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JDBOR date="2025-06-24 07:35:28" version="1.3.42 / 4.1.8 [2025-03-03]" copyright="Orphanet (c) 2025" dbserver="jdbc:sybase:Tds:canard.orpha.net:2020">
+  <Availability> 
+    <Licence>
+      <FullName lang="en">Creative Commons Attribution 4.0 International</FullName>
+      <ShortIdentifier>CC-BY-4.0</ShortIdentifier>
+      <LegalCode>https://creativecommons.org/licenses/by/4.0/legalcode</LegalCode>
+    </Licence>
+  </Availability>
+  <DisorderList count="9784">
+    <Disorder id="17601">
+      <OrphaCode>166024</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166024</ExpertLink>
+      <Name lang="en">Multiple epiphyseal dysplasia-macrocephaly-facial dysmorphism syndrome</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17601" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="2">
+      <OrphaCode>58</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=58</ExpertLink>
+      <Name lang="en">Alexander disease</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13024">
+            <OrphaCode>98006</OrphaCode>
+            <Name lang="en">Rare neurologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="2" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17603">
+      <OrphaCode>166032</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166032</ExpertLink>
+      <Name lang="en">Multiple epiphyseal dysplasia-miniepiphyses syndrome</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17603" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="3">
+      <OrphaCode>61</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=61</ExpertLink>
+      <Name lang="en">Alpha-mannosidosis</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="3" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17602">
+      <OrphaCode>166029</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166029</ExpertLink>
+      <Name lang="en">Multiple epiphyseal dysplasia-severe proximal femoral dysplasia syndrome</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17602" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17605">
+      <OrphaCode>166038</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166038</ExpertLink>
+      <Name lang="en">Metaphyseal chondrodysplasia, Kaitila type</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17605" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="5">
+      <OrphaCode>93</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=93</ExpertLink>
+      <Name lang="en">Aspartylglucosaminuria</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="5" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17604">
+      <OrphaCode>166035</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166035</ExpertLink>
+      <Name lang="en">Brachydactyly-short stature-retinitis pigmentosa syndrome</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17604" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="6">
+      <OrphaCode>585</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=585</ExpertLink>
+      <Name lang="en">Multiple sulfatase deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="6" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="7">
+      <OrphaCode>118</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=118</ExpertLink>
+      <Name lang="en">Beta-mannosidosis</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="7" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="8">
+      <OrphaCode>141</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=141</ExpertLink>
+      <Name lang="en">Canavan disease</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13024">
+            <OrphaCode>98006</OrphaCode>
+            <Name lang="en">Rare neurologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="8" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17608">
+      <OrphaCode>166063</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166063</ExpertLink>
+      <Name lang="en">Pontocerebellar hypoplasia type 4</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12469">
+            <OrphaCode>93890</OrphaCode>
+            <Name lang="en">Rare developmental defect during embryogenesis</Name>
+          </TargetDisorder>
+          <RootDisorder id="17608" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17611">
+      <OrphaCode>166078</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166078</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 1</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17611" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17610">
+      <OrphaCode>166073</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166073</ExpertLink>
+      <Name lang="en">Pontocerebellar hypoplasia type 6</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12469">
+            <OrphaCode>93890</OrphaCode>
+            <Name lang="en">Rare developmental defect during embryogenesis</Name>
+          </TargetDisorder>
+          <RootDisorder id="17610" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="11">
+      <OrphaCode>213</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=213</ExpertLink>
+      <Name lang="en">Cystinosis</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="11" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17613">
+      <OrphaCode>166084</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166084</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 2A</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17613" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="12">
+      <OrphaCode>333</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=333</ExpertLink>
+      <Name lang="en">Farber disease</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="12" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17612">
+      <OrphaCode>166081</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166081</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 2</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17612" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="13">
+      <OrphaCode>349</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=349</ExpertLink>
+      <Name lang="en">Fucosidosis</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="13" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17615">
+      <OrphaCode>166090</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166090</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 2M</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17615" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="14">
+      <OrphaCode>365</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=365</ExpertLink>
+      <Name lang="en">Glycogen storage disease due to acid maltase deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="14" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17614">
+      <OrphaCode>166087</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166087</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 2B</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17614" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="15">
+      <OrphaCode>366</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=366</ExpertLink>
+      <Name lang="en">Glycogen storage disease due to glycogen debranching enzyme deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="15" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17616">
+      <OrphaCode>166093</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166093</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 2N</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17616" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17">
+      <OrphaCode>368</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=368</ExpertLink>
+      <Name lang="en">Glycogen storage disease due to muscle glycogen phosphorylase deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="17" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17617">
+      <OrphaCode>166096</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166096</ExpertLink>
+      <Name lang="en">Von Willebrand disease type 3</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="13010">
+            <OrphaCode>97992</OrphaCode>
+            <Name lang="en">Rare hematologic disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17617" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="16">
+      <OrphaCode>367</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=367</ExpertLink>
+      <Name lang="en">Glycogen storage disease due to glycogen branching enzyme deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="16" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="17618">
+      <OrphaCode>166100</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=166100</ExpertLink>
+      <Name lang="en">Autosomal dominant otospondylomegaepiphyseal dysplasia</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="12333">
+            <OrphaCode>93419</OrphaCode>
+            <Name lang="en">Rare bone disease</Name>
+          </TargetDisorder>
+          <RootDisorder id="17618" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
+        </DisorderDisorderAssociation>
+      </DisorderDisorderAssociationList>
+    </Disorder>
+    <Disorder id="19">
+      <OrphaCode>371</OrphaCode>
+      <ExpertLink lang="en">http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=en&amp;Expert=371</ExpertLink>
+      <Name lang="en">Glycogen storage disease due to muscle phosphofructokinase deficiency</Name>
+      <DisorderDisorderAssociationList count="1">
+        <DisorderDisorderAssociation>
+          <TargetDisorder id="10507">
+            <OrphaCode>68367</OrphaCode>
+            <Name lang="en">Rare inborn errors of metabolism</Name>
+          </TargetDisorder>
+          <RootDisorder id="19" cycle="true"/>
+          <DisorderDisorderAssociationType id="21485">
+            <Name lang="en">Preferential parent</Name>
+          </DisorderDisorderAssociationType>
