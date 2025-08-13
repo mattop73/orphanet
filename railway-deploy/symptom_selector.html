@@ -462,7 +462,8 @@ const API_BASE = window.location.origin;
                 const requestData = {
                     present_symptoms: selectedSymptoms,
                     absent_symptoms: [],
-                    top_n: 10
+                    top_n: 10,
+                    computation_mode: "fast"  // Simple selector uses fast mode by default
                 };
 
                 const response = await fetch(`${API_BASE}/diagnose`, {

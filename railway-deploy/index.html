@@ -188,6 +188,98 @@
             border-color: #4facfe;
         }
 
+        /* Computation Mode Switch */
+        .computation-mode-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .computation-mode-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .computation-mode-title {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .computation-mode-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .computation-mode-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .computation-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #28a745;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .computation-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .computation-slider {
+            background-color: #dc3545;
+        }
+
+        input:checked + .computation-slider:before {
+            transform: translateX(30px);
+        }
+
+        .computation-mode-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .computation-mode-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .mode-fast {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .mode-true {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
         .diagnose-btn {
             width: 100%;
             padding: 15px;
@@ -391,6 +483,23 @@
                     <div class="toggle-btn" data-type="absent">Absent Symptoms</div>
                 </div>
 
+                <div class="computation-mode-section">
+                    <div class="computation-mode-header">
+                        <div class="computation-mode-title">⚡ Computation Mode</div>
+                        <label class="computation-mode-switch">
+                            <input type="checkbox" id="computation-mode-switch">
+                            <span class="computation-slider"></span>
+                        </label>
+                    </div>
+                    <div class="computation-mode-labels">
+                        <span class="mode-fast">FAST</span>
+                        <span class="mode-true">TRUE</span>
+                    </div>
+                    <div class="computation-mode-info" id="computation-mode-info">
+                        <span class="mode-fast">Fast mode</span>: Pre-computed probabilities (~100ms) - Good for quick results
+                    </div>
+                </div>
+
                 <div class="symptom-search">
                     <input type="text" id="symptom-input" placeholder="Search for symptoms..." autocomplete="off">
                     <div class="symptom-suggestions" id="symptom-suggestions"></div>
@@ -487,6 +596,7 @@
         function setupEventListeners() {
             const symptomInput = document.getElementById('symptom-input');
             const toggleBtns = document.querySelectorAll('.toggle-btn');
+            const computationModeSwitch = document.getElementById('computation-mode-switch');
 
             // Symptom input handling
             symptomInput.addEventListener('input', handleSymptomInput);
@@ -502,6 +612,11 @@
                     currentSymptomType = e.target.dataset.type;
                     symptomInput.placeholder = `Search for ${currentSymptomType} symptoms...`;
                 });
+            });
+
+            // Computation mode switch
+            computationModeSwitch.addEventListener('change', (e) => {
+                updateComputationModeInfo(e.target.checked);
             });
         }
 
@@ -609,6 +724,22 @@
             btn.disabled = presentSymptoms.length === 0;
         }
 
+        // Update computation mode info text
+        function updateComputationModeInfo(isTrueMode) {
+            const infoElement = document.getElementById('computation-mode-info');
+            if (isTrueMode) {
+                infoElement.innerHTML = '<span class="mode-true">True Bayesian mode</span>: Full normalization computation (~5-30s) - Most accurate results';
+            } else {
+                infoElement.innerHTML = '<span class="mode-fast">Fast mode</span>: Pre-computed probabilities (~100ms) - Good for quick results';
+            }
+        }
+
+        // Get current computation mode
+        function getComputationMode() {
+            const switchElement = document.getElementById('computation-mode-switch');
+            return switchElement.checked ? 'true' : 'fast';
+        }
+
         // Perform diagnosis
         async function performDiagnosis() {
             if (presentSymptoms.length === 0) {
@@ -620,15 +751,20 @@
             console.log('Starting diagnosis with symptoms:', presentSymptoms);
 
             try {
+                const computationMode = getComputationMode();
                 const requestData = {
                     present_symptoms: presentSymptoms,
                     absent_symptoms: absentSymptoms,
-                    top_n: 10
+                    top_n: 10,
+                    computation_mode: computationMode
                 };
 
-                // Add timeout to prevent hanging
+                console.log('Using computation mode:', computationMode);
+
+                // Add timeout to prevent hanging - longer timeout for true mode
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                const timeoutDuration = computationMode === 'true' ? 60000 : 30000; // 60s for true, 30s for fast
+                const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
                 const response = await fetch(`${API_BASE}/diagnose`, {
                     method: 'POST',
@@ -690,6 +826,8 @@
             }
 
             // Create stats
+            const modeColor = data.computation_mode === 'true' ? '#dc3545' : '#28a745';
+            const modeIcon = data.computation_mode === 'true' ? '🧮' : '⚡';
             const statsHtml = `
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -703,6 +841,10 @@
                     <div class="stat-card">
                         <span class="stat-number">${Math.round(data.processing_time_ms)}ms</span>
                         <span class="stat-label">Processing Time</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" style="color: ${modeColor}">${modeIcon} ${data.computation_mode.toUpperCase()}</span>
+                        <span class="stat-label">Computation Mode</span>
                     </div>
                 </div>
             `;

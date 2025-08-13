@@ -42,7 +42,8 @@ class DiagnosisRequest(BaseModel):
             "example": {
                 "present_symptoms": ["Seizure", "Intellectual disability"],
                 "absent_symptoms": ["Fever"],
-                "top_n": 10
+                "top_n": 10,
+                "computation_mode": "fast"
             }
         }
     )
@@ -61,6 +62,11 @@ class DiagnosisRequest(BaseModel):
         description="Number of top diagnoses to return",
         ge=1,
         le=50
+    )
+    computation_mode: str = Field(
+        default="fast",
+        description="Computation mode: 'fast' (pre-computed) or 'true' (full Bayesian)",
+        pattern="^(fast|true)$"
     )
 
 
@@ -81,6 +87,7 @@ class DiagnosisResponse(BaseModel):
     total_diseases_evaluated: int = Field(..., description="Total number of diseases evaluated")
     input_symptoms: List[str] = Field(..., description="Input symptoms that were processed")
     processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+    computation_mode: str = Field(..., description="Computation mode used: 'fast' or 'true'")
 
 
 class SystemInfo(BaseModel):
@@ -153,6 +160,110 @@ def load_disease_data() -> bool:
     except Exception as e:
         logger.error(f"Error loading disease data: {e}")
         return False
+
+
+def calculate_true_bayesian_probability(
+    disease_name: str,
+    present_symptoms: List[str],
+    absent_symptoms: List[str] = None,
+    all_diseases_data: pd.DataFrame = None
+) -> Dict[str, Any]:
+    """
+    Calculate true Bayesian probability using full dataset normalization
+    This is more accurate but slower than the fast method
+    """
+    global disease_data
+    
+    if absent_symptoms is None:
+        absent_symptoms = []
+    
+    if all_diseases_data is None:
+        all_diseases_data = disease_data
+    
+    # Get disease-specific data
+    disease_symptoms = all_diseases_data[all_diseases_data['disorder_name'] == disease_name]
+    
+    if disease_symptoms.empty:
+        return {
+            'probability': 0.0,
+            'matching_symptoms': [],
+            'total_symptoms': 0,
+            'confidence_score': 0.0
+        }
+    
+    # Calculate prior probability based on disease prevalence/frequency in dataset
+    total_diseases = len(all_diseases_data['disorder_name'].unique())
+    disease_associations = len(disease_symptoms)
+    total_associations = len(all_diseases_data)
+    
+    # Prior: How common is this disease in our dataset
+    prior = disease_associations / total_associations
+    
+    # Calculate likelihood P(symptoms|disease)
+    symptom_freq_map = dict(zip(disease_symptoms['hpo_term'], disease_symptoms['frequency_numeric']))
+    
+    likelihood = 1.0
+    matching_symptoms = []
+    
+    # For present symptoms: P(symptom present | disease)
+    for symptom in present_symptoms:
+        if symptom in symptom_freq_map:
+            freq = symptom_freq_map[symptom]
+            likelihood *= freq
+            matching_symptoms.append(symptom)
+        else:
+            # Symptom not associated with this disease
+            likelihood *= 0.01  # Very small probability for unseen symptoms
+    
+    # For absent symptoms: P(symptom absent | disease) = 1 - P(symptom present | disease)
+    for symptom in absent_symptoms:
+        if symptom in symptom_freq_map:
+            freq = symptom_freq_map[symptom]
+            likelihood *= (1 - freq)
+    
+    # Calculate evidence P(symptoms) by summing over all diseases
+    evidence = 0.0
+    for other_disease in all_diseases_data['disorder_name'].unique():
+        other_disease_symptoms = all_diseases_data[all_diseases_data['disorder_name'] == other_disease]
+        other_symptom_freq_map = dict(zip(other_disease_symptoms['hpo_term'], other_disease_symptoms['frequency_numeric']))
+        
+        # Prior for this other disease
+        other_prior = len(other_disease_symptoms) / total_associations
+        
+        # Likelihood for this other disease
+        other_likelihood = 1.0
+        
+        for symptom in present_symptoms:
+            if symptom in other_symptom_freq_map:
+                freq = other_symptom_freq_map[symptom]
+                other_likelihood *= freq
+            else:
+                other_likelihood *= 0.01
+        
+        for symptom in absent_symptoms:
+            if symptom in other_symptom_freq_map:
+                freq = other_symptom_freq_map[symptom]
+                other_likelihood *= (1 - freq)
+        
+        evidence += other_prior * other_likelihood
+    
+    # Avoid division by zero
+    if evidence == 0:
+        evidence = 1e-10
+    
+    # True Bayesian posterior: P(disease|symptoms) = P(symptoms|disease) * P(disease) / P(symptoms)
+    posterior = (likelihood * prior) / evidence
+    
+    # Calculate confidence score
+    total_disease_symptoms = len(disease_symptoms)
+    confidence_score = len(matching_symptoms) / max(len(present_symptoms), 1)
+    
+    return {
+        'probability': min(posterior, 1.0),  # Cap at 1.0
+        'matching_symptoms': matching_symptoms,
+        'total_symptoms': total_disease_symptoms,
+        'confidence_score': confidence_score
+    }
 
 
 def calculate_bayesian_probability(
@@ -427,16 +538,96 @@ async def get_diseases(
 @app.post("/diagnose", response_model=DiagnosisResponse)
 async def diagnose_disease(request: DiagnosisRequest):
     """
-    Perform ultra-fast Bayesian disease diagnosis using local pre-computed probabilities
+    Perform Bayesian disease diagnosis with choice between fast and true computation modes
+    - fast: Uses pre-computed probabilities (faster, ~100ms)
+    - true: Full Bayesian computation with proper normalization (slower, ~5-30s)
     """
     global disease_data, diseases_list, symptoms_list
     
     import time
     start_time = time.time()
     
+    logger.info(f"🎯 Diagnosis request: mode={request.computation_mode}, symptoms={request.present_symptoms}")
+    
     try:
-        # Try ultra-fast diagnosis first
-        if fast_diagnosis.is_ready:
+        # Force true Bayesian mode if requested
+        if request.computation_mode == "true":
+            logger.info("🧮 Using TRUE Bayesian computation (full normalization)")
+            
+            if disease_data is None or not diseases_list:
+                raise HTTPException(status_code=503, detail="Disease data not loaded")
+            
+            # Validate symptoms exist in our dataset
+            valid_present_symptoms = [
+                symptom for symptom in request.present_symptoms
+                if symptom in symptoms_list
+            ]
+            
+            if not valid_present_symptoms:
+                raise HTTPException(
+                    status_code=400,
+                    detail="None of the provided symptoms are found in the database"
+                )
+            
+            valid_absent_symptoms = [
+                symptom for symptom in request.absent_symptoms
+                if symptom in symptoms_list
+            ]
+            
+            # Use all diseases for true Bayesian computation
+            logger.info(f"🔄 Computing true Bayesian probabilities for ALL {len(diseases_list)} diseases...")
+            
+            results = []
+            
+            for i, disease in enumerate(diseases_list):
+                if i % 100 == 0:
+                    logger.info(f"   Processing disease {i+1}/{len(diseases_list)}: {disease}")
+                
+                try:
+                    result = calculate_true_bayesian_probability(
+                        disease,
+                        valid_present_symptoms,
+                        valid_absent_symptoms,
+                        disease_data
+                    )
+                    
+                    if result['probability'] > 0 or len(result['matching_symptoms']) > 0:
+                        # Get orpha code for this disease
+                        disease_info = disease_data[disease_data['disorder_name'] == disease].iloc[0]
+                        
+                        results.append(DiagnosisResult(
+                            disorder_name=disease,
+                            orpha_code=str(disease_info['orpha_code']),
+                            probability=result['probability'],
+                            matching_symptoms=result['matching_symptoms'],
+                            total_symptoms=result['total_symptoms'],
+                            confidence_score=result['confidence_score']
+                        ))
+                except Exception as e:
+                    logger.warning(f"Error calculating true Bayesian probability for {disease}: {e}")
+                    continue
+            
+            logger.info(f"✅ True Bayesian computation completed for {len(results)} diseases with matches")
+            
+            # Sort by probability (true Bayesian probabilities should sum to 1 across all diseases)
+            results.sort(key=lambda x: x.probability, reverse=True)
+            
+            # Return top N results
+            top_results = results[:request.top_n]
+            
+            processing_time = (time.time() - start_time) * 1000
+            
+            return DiagnosisResponse(
+                success=True,
+                results=top_results,
+                total_diseases_evaluated=len(diseases_list),
+                input_symptoms=valid_present_symptoms,
+                processing_time_ms=processing_time,
+                computation_mode="true"
+            )
+        
+        # Fast mode (default) - Try ultra-fast diagnosis first
+        elif fast_diagnosis.is_ready:
             logger.info(f"🚀 Using ultra-fast diagnosis for symptoms: {request.present_symptoms}")
             
             # Validate symptoms using fast diagnosis
@@ -484,7 +675,8 @@ async def diagnose_disease(request: DiagnosisRequest):
                 results=api_results,
                 total_diseases_evaluated=result['total_diseases_evaluated'],
                 input_symptoms=valid_present_symptoms,
-                processing_time_ms=processing_time
+                processing_time_ms=processing_time,
+                computation_mode="fast"
             )
         
         # Fallback to regular diagnosis
@@ -569,7 +761,8 @@ async def diagnose_disease(request: DiagnosisRequest):
                 results=top_results,
                 total_diseases_evaluated=len(results),
                 input_symptoms=valid_present_symptoms,
-                processing_time_ms=processing_time
+                processing_time_ms=processing_time,
+                computation_mode="fast"
             )
         
     except Exception as e:
