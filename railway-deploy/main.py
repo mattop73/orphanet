@@ -19,8 +19,13 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ConfigDict
 import uvicorn
 
-# Import Supabase diagnosis
-from supabase_diagnosis import supabase_diagnosis, initialize_supabase_diagnosis
+# Import Supabase diagnosis with fallback
+try:
+    from supabase_diagnosis import supabase_diagnosis, initialize_supabase_diagnosis
+    logger.info("✅ Using full Supabase client")
+except Exception as e:
+    logger.warning(f"⚠️ Full Supabase client failed, using simple version: {e}")
+    from simple_supabase_diagnosis import simple_supabase_diagnosis as supabase_diagnosis, initialize_simple_supabase_diagnosis as initialize_supabase_diagnosis
 
 # Configure logging
 logging.basicConfig(
@@ -475,7 +480,7 @@ async def get_symptoms(
     global symptoms_list
     
     # Try Supabase diagnosis first
-    if supabase_diagnosis.is_ready:
+    if supabase_diagnosis and supabase_diagnosis.is_ready:
         supabase_symptoms = supabase_diagnosis.get_symptoms(search, limit)
         return {
             "symptoms": supabase_symptoms,
@@ -554,7 +559,7 @@ async def diagnose_disease(request: DiagnosisRequest):
         if request.computation_mode == "true":
             logger.info("🧮 Using TRUE Bayesian computation with Supabase")
             
-            if not supabase_diagnosis.is_ready:
+            if not supabase_diagnosis or not supabase_diagnosis.is_ready:
                 raise HTTPException(status_code=503, detail="Supabase diagnosis system not ready")
             
             # Use Supabase true Bayesian diagnosis
@@ -590,7 +595,7 @@ async def diagnose_disease(request: DiagnosisRequest):
             )
         
         # Fast mode (default) - Try Supabase fast diagnosis first
-        elif supabase_diagnosis.is_ready:
+        elif supabase_diagnosis and supabase_diagnosis.is_ready:
             logger.info(f"🚀 Using Supabase fast diagnosis for symptoms: {request.present_symptoms}")
             
             # Use Supabase fast diagnosis

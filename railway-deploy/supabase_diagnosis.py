@@ -43,9 +43,14 @@ class SupabaseDiagnosis:
         
         # Use service key for data operations if available, otherwise anon key
         primary_key = self.supabase_service_key if self.supabase_service_key else self.supabase_anon_key
-        self.supabase: Client = create_client(self.supabase_url, primary_key)
         
-        logger.info(f"🔑 Using {'service role' if self.supabase_service_key else 'anon'} key for Supabase")
+        try:
+            self.supabase: Client = create_client(self.supabase_url, primary_key)
+            logger.info(f"🔑 Using {'service role' if self.supabase_service_key else 'anon'} key for Supabase")
+        except Exception as e:
+            logger.error(f"❌ Failed to create Supabase client: {e}")
+            raise ValueError(f"Failed to initialize Supabase client: {e}")
+        
         self.is_ready = False
         
         # Cache for frequently accessed data
@@ -391,8 +396,8 @@ class SupabaseDiagnosis:
             raise Exception(f"Fallback diagnosis failed: {str(e)}")
 
 
-# Global instance
-supabase_diagnosis = SupabaseDiagnosis()
+# Global instance - initialized later to avoid import-time crashes
+supabase_diagnosis = None
 
 
 def initialize_supabase_diagnosis() -> bool:
@@ -400,6 +405,11 @@ def initialize_supabase_diagnosis() -> bool:
     global supabase_diagnosis
     
     try:
+        # Initialize the client only when needed
+        if supabase_diagnosis is None:
+            logger.info("🔄 Creating Supabase diagnosis client...")
+            supabase_diagnosis = SupabaseDiagnosis()
+        
         if supabase_diagnosis.test_connection():
             supabase_diagnosis.is_ready = True
             logger.info("✅ Supabase diagnosis system ready!")
@@ -410,6 +420,9 @@ def initialize_supabase_diagnosis() -> bool:
             
     except Exception as e:
         logger.error(f"❌ Error initializing Supabase diagnosis: {e}")
+        logger.error("💡 This might be due to missing environment variables or network issues")
+        # Set a dummy object to prevent further crashes
+        supabase_diagnosis = type('DummySupabase', (), {'is_ready': False})()
         return False
 
 

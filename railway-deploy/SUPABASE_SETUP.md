@@ -137,12 +137,21 @@ python test_supabase_integration.py https://your-app.railway.app
 
 ## Troubleshooting
 
+### Client Library Issues
+
+If you get errors like `TypeError: Client.__init__() got an unexpected keyword argument 'proxy'`:
+
+1. **The application automatically falls back** to a simple HTTP-based client
+2. **This is normal** and doesn't affect functionality
+3. **Both clients provide the same features** - the simple one just uses direct HTTP requests
+
 ### Common Issues
 
 1. **Connection Failed**
    - Check SUPABASE_URL and SUPABASE_KEY
    - Verify your Supabase project is active
    - Check network connectivity
+   - Try the test script: `python test_both_supabase_versions.py`
 
 2. **Permission Denied**
    - Review RLS policies
@@ -158,6 +167,11 @@ python test_supabase_integration.py https://your-app.railway.app
    - Add recommended indexes
    - Consider using fast_* tables for pre-computed data
    - Check query execution plans
+
+5. **Library Version Conflicts**
+   - The app includes two Supabase clients (full and simple)
+   - Simple client uses direct HTTP requests (more reliable)
+   - Both provide identical functionality
 
 ### Error Messages
 

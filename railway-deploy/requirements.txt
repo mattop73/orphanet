@@ -17,6 +17,8 @@ starlette==0.27.0
 # Optional: For better performance
 orjson==3.9.10
 
-# Supabase integration
-supabase==2.3.0
+# Supabase integration - using stable version with explicit dependencies
+supabase==1.2.0
 python-dotenv==1.0.0
+httpx==0.24.1
+requests==2.31.0
