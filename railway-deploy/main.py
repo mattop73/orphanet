@@ -19,8 +19,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ConfigDict
 import uvicorn
 
-# Import local fast diagnosis
-from local_fast_diagnosis import fast_diagnosis, initialize_fast_diagnosis
+# Import Supabase diagnosis
+from supabase_diagnosis import supabase_diagnosis, initialize_supabase_diagnosis
 
 # Configure logging
 logging.basicConfig(
@@ -335,9 +335,9 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Enhanced Bayesian Disease Diagnosis API...")
     
-    # Try fast diagnosis first
-    if initialize_fast_diagnosis():
-        logger.info("✅ Fast diagnosis system ready!")
+    # Try Supabase diagnosis first
+    if initialize_supabase_diagnosis():
+        logger.info("✅ Supabase diagnosis system ready!")
     else:
         # Fallback to regular CSV loading
         logger.info("Falling back to regular CSV loading...")
@@ -474,15 +474,15 @@ async def get_symptoms(
     """Get list of available symptoms"""
     global symptoms_list
     
-    # Try fast diagnosis first
-    if fast_diagnosis.is_ready:
-        fast_symptoms = fast_diagnosis.get_symptoms(search, limit)
+    # Try Supabase diagnosis first
+    if supabase_diagnosis.is_ready:
+        supabase_symptoms = supabase_diagnosis.get_symptoms(search, limit)
         return {
-            "symptoms": fast_symptoms,
-            "total_available": len(fast_diagnosis.symptoms_list),
-            "filtered_count": len(fast_symptoms),
+            "symptoms": supabase_symptoms,
+            "total_available": len(supabase_symptoms) if not search else "Unknown",
+            "filtered_count": len(supabase_symptoms),
             "search_term": search,
-            "method": "local_fast"
+            "method": "supabase"
         }
     
     # Fallback to regular method
@@ -552,105 +552,15 @@ async def diagnose_disease(request: DiagnosisRequest):
     try:
         # Force true Bayesian mode if requested
         if request.computation_mode == "true":
-            logger.info("🧮 Using TRUE Bayesian computation (full normalization)")
+            logger.info("🧮 Using TRUE Bayesian computation with Supabase")
             
-            if disease_data is None or not diseases_list:
-                raise HTTPException(status_code=503, detail="Disease data not loaded")
+            if not supabase_diagnosis.is_ready:
+                raise HTTPException(status_code=503, detail="Supabase diagnosis system not ready")
             
-            # Validate symptoms exist in our dataset
-            valid_present_symptoms = [
-                symptom for symptom in request.present_symptoms
-                if symptom in symptoms_list
-            ]
-            
-            if not valid_present_symptoms:
-                raise HTTPException(
-                    status_code=400,
-                    detail="None of the provided symptoms are found in the database"
-                )
-            
-            valid_absent_symptoms = [
-                symptom for symptom in request.absent_symptoms
-                if symptom in symptoms_list
-            ]
-            
-            # Use all diseases for true Bayesian computation
-            logger.info(f"🔄 Computing true Bayesian probabilities for ALL {len(diseases_list)} diseases...")
-            
-            results = []
-            
-            for i, disease in enumerate(diseases_list):
-                if i % 100 == 0:
-                    logger.info(f"   Processing disease {i+1}/{len(diseases_list)}: {disease}")
-                
-                try:
-                    result = calculate_true_bayesian_probability(
-                        disease,
-                        valid_present_symptoms,
-                        valid_absent_symptoms,
-                        disease_data
-                    )
-                    
-                    if result['probability'] > 0 or len(result['matching_symptoms']) > 0:
-                        # Get orpha code for this disease
-                        disease_info = disease_data[disease_data['disorder_name'] == disease].iloc[0]
-                        
-                        results.append(DiagnosisResult(
-                            disorder_name=disease,
-                            orpha_code=str(disease_info['orpha_code']),
-                            probability=result['probability'],
-                            matching_symptoms=result['matching_symptoms'],
-                            total_symptoms=result['total_symptoms'],
-                            confidence_score=result['confidence_score']
-                        ))
-                except Exception as e:
-                    logger.warning(f"Error calculating true Bayesian probability for {disease}: {e}")
-                    continue
-            
-            logger.info(f"✅ True Bayesian computation completed for {len(results)} diseases with matches")
-            
-            # Sort by probability (true Bayesian probabilities should sum to 1 across all diseases)
-            results.sort(key=lambda x: x.probability, reverse=True)
-            
-            # Return top N results
-            top_results = results[:request.top_n]
-            
-            processing_time = (time.time() - start_time) * 1000
-            
-            return DiagnosisResponse(
-                success=True,
-                results=top_results,
-                total_diseases_evaluated=len(diseases_list),
-                input_symptoms=valid_present_symptoms,
-                processing_time_ms=processing_time,
-                computation_mode="true"
-            )
-        
-        # Fast mode (default) - Try ultra-fast diagnosis first
-        elif fast_diagnosis.is_ready:
-            logger.info(f"🚀 Using ultra-fast diagnosis for symptoms: {request.present_symptoms}")
-            
-            # Validate symptoms using fast diagnosis
-            valid_present_symptoms = [
-                symptom for symptom in request.present_symptoms
-                if symptom in fast_diagnosis.symptoms_list
-            ]
-            
-            if not valid_present_symptoms:
-                raise HTTPException(
-                    status_code=400,
-                    detail="None of the provided symptoms are found in the database"
-                )
-            
-            valid_absent_symptoms = [
-                symptom for symptom in request.absent_symptoms
-                if symptom in fast_diagnosis.symptoms_list
-            ]
-            
-            # Use ultra-fast diagnosis
-            result = fast_diagnosis.ultra_fast_diagnosis(
-                valid_present_symptoms,
-                valid_absent_symptoms,
+            # Use Supabase true Bayesian diagnosis
+            result = supabase_diagnosis.true_bayesian_diagnosis(
+                request.present_symptoms,
+                request.absent_symptoms,
                 request.top_n
             )
             
@@ -668,13 +578,49 @@ async def diagnose_disease(request: DiagnosisRequest):
             
             processing_time = result['processing_time_ms']
             
-            logger.info(f"⚡ Ultra-fast diagnosis completed in {processing_time:.1f}ms")
+            logger.info(f"🧮 True Bayesian computation completed in {processing_time:.1f}ms")
             
             return DiagnosisResponse(
                 success=True,
                 results=api_results,
                 total_diseases_evaluated=result['total_diseases_evaluated'],
-                input_symptoms=valid_present_symptoms,
+                input_symptoms=request.present_symptoms,
+                processing_time_ms=processing_time,
+                computation_mode="true"
+            )
+        
+        # Fast mode (default) - Try Supabase fast diagnosis first
+        elif supabase_diagnosis.is_ready:
+            logger.info(f"🚀 Using Supabase fast diagnosis for symptoms: {request.present_symptoms}")
+            
+            # Use Supabase fast diagnosis
+            result = supabase_diagnosis.fast_diagnosis(
+                request.present_symptoms,
+                request.absent_symptoms,
+                request.top_n
+            )
+            
+            # Convert to API format
+            api_results = []
+            for res in result['results']:
+                api_results.append(DiagnosisResult(
+                    disorder_name=res['disorder_name'],
+                    orpha_code=res['orpha_code'],
+                    probability=res['probability'],
+                    matching_symptoms=res['matching_symptoms'],
+                    total_symptoms=res['total_symptoms'],
+                    confidence_score=res['confidence_score']
+                ))
+            
+            processing_time = result['processing_time_ms']
+            
+            logger.info(f"⚡ Supabase fast diagnosis completed in {processing_time:.1f}ms")
+            
+            return DiagnosisResponse(
+                success=True,
+                results=api_results,
+                total_diseases_evaluated=result['total_diseases_evaluated'],
+                input_symptoms=request.present_symptoms,
                 processing_time_ms=processing_time,
                 computation_mode="fast"
             )
