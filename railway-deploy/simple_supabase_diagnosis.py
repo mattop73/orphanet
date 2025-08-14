@@ -282,12 +282,12 @@ class SimpleSupabaseDiagnosis:
                 matching_diseases.update(symptom_diseases)
             
             # If we have too many matching diseases, limit to most frequent ones
-            if len(matching_diseases) > 100:
+            if len(matching_diseases) > 25:
                 disease_counts = df[df['disorder_name'].isin(matching_diseases)].groupby('disorder_name').size()
-                top_diseases = disease_counts.nlargest(100).index.tolist()
+                top_diseases = disease_counts.nlargest(25).index.tolist()
                 matching_diseases = set(top_diseases)
             
-            computation_diseases = list(matching_diseases) if matching_diseases else all_diseases[:50]
+            computation_diseases = list(matching_diseases) if matching_diseases else all_diseases[:25]
             logger.info(f"🔄 Computing for {len(computation_diseases)} relevant diseases...")
             
             for i, disease in enumerate(computation_diseases):

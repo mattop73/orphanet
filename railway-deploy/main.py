@@ -590,8 +590,8 @@ async def diagnose_disease(request: DiagnosisRequest):
                     matching_diseases = disease_data[disease_data['hpo_term'] == symptom]['disorder_name'].unique()
                     relevant_diseases.update(matching_diseases)
                 
-                # Limit to top 50 most relevant diseases to prevent timeout
-                relevant_diseases = list(relevant_diseases)[:50]
+                # Limit to top 20 most relevant diseases to prevent timeout
+                relevant_diseases = list(relevant_diseases)[:20]
                 logger.info(f"Computing for {len(relevant_diseases)} relevant diseases (CSV fallback)")
                 
                 for i, disease in enumerate(relevant_diseases):

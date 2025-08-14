@@ -774,6 +774,9 @@
             showLoading(computationMode);
             console.log('Starting diagnosis with symptoms:', presentSymptoms);
 
+            // Set timeout duration based on mode - much longer for true mode
+            const timeoutDuration = computationMode === 'true' ? 300000 : 30000; // 5 minutes for true, 30s for fast
+
             try {
                 const requestData = {
                     present_symptoms: presentSymptoms,
@@ -784,9 +787,8 @@
 
                 console.log('Using computation mode:', computationMode);
 
-                // Add timeout to prevent hanging - much longer timeout for true mode
+                // Add timeout to prevent hanging
                 const controller = new AbortController();
-                const timeoutDuration = computationMode === 'true' ? 120000 : 30000; // 2 minutes for true, 30s for fast
                 const timeoutId = setTimeout(() => {
                     console.log(`Request timed out after ${timeoutDuration/1000} seconds`);
                     controller.abort();
