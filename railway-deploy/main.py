@@ -582,9 +582,19 @@ async def diagnose_disease(request: DiagnosisRequest):
                     if symptom in symptoms_list
                 ]
                 
-                # Simple CSV-based computation
+                # Simple CSV-based computation (limited for performance)
                 results = []
-                for i, disease in enumerate(diseases_list[:100]):  # Limit to prevent timeout
+                # Limit to diseases that have at least one matching symptom for efficiency
+                relevant_diseases = set()
+                for symptom in valid_present_symptoms:
+                    matching_diseases = disease_data[disease_data['hpo_term'] == symptom]['disorder_name'].unique()
+                    relevant_diseases.update(matching_diseases)
+                
+                # Limit to top 50 most relevant diseases to prevent timeout
+                relevant_diseases = list(relevant_diseases)[:50]
+                logger.info(f"Computing for {len(relevant_diseases)} relevant diseases (CSV fallback)")
+                
+                for i, disease in enumerate(relevant_diseases):
                     try:
                         result = calculate_true_bayesian_probability(
                             disease,
@@ -616,7 +626,7 @@ async def diagnose_disease(request: DiagnosisRequest):
                 return DiagnosisResponse(
                     success=True,
                     results=top_results,
-                    total_diseases_evaluated=len(diseases_list[:100]),
+                    total_diseases_evaluated=len(relevant_diseases),
                     input_symptoms=valid_present_symptoms,
                     processing_time_ms=processing_time,
                     computation_mode="true"

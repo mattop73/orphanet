@@ -275,9 +275,24 @@ class SimpleSupabaseDiagnosis:
             evidence = 0.0
             disease_posteriors = {}
             
-            for i, disease in enumerate(all_diseases):
-                if i % 100 == 0:
-                    logger.info(f"   Processing disease {i+1}/{len(all_diseases)}")
+            # Limit computation to prevent timeout - focus on diseases with matching symptoms
+            matching_diseases = set()
+            for symptom in valid_present_symptoms:
+                symptom_diseases = df[df['hpo_term'] == symptom]['disorder_name'].unique()
+                matching_diseases.update(symptom_diseases)
+            
+            # If we have too many matching diseases, limit to most frequent ones
+            if len(matching_diseases) > 100:
+                disease_counts = df[df['disorder_name'].isin(matching_diseases)].groupby('disorder_name').size()
+                top_diseases = disease_counts.nlargest(100).index.tolist()
+                matching_diseases = set(top_diseases)
+            
+            computation_diseases = list(matching_diseases) if matching_diseases else all_diseases[:50]
+            logger.info(f"🔄 Computing for {len(computation_diseases)} relevant diseases...")
+            
+            for i, disease in enumerate(computation_diseases):
+                if i % 25 == 0:
+                    logger.info(f"   Processing disease {i+1}/{len(computation_diseases)}")
                 
                 # Get disease-specific data
                 disease_data = df[df['disorder_name'] == disease]
@@ -349,7 +364,7 @@ class SimpleSupabaseDiagnosis:
             return {
                 'success': True,
                 'results': top_results,
-                'total_diseases_evaluated': len(all_diseases),
+                'total_diseases_evaluated': len(computation_diseases),
                 'processing_time_ms': processing_time
             }
             

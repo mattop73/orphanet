@@ -770,7 +770,7 @@
                 return;
             }
 
-            showLoading();
+            showLoading(computationMode);
             console.log('Starting diagnosis with symptoms:', presentSymptoms);
 
             try {
@@ -784,10 +784,13 @@
 
                 console.log('Using computation mode:', computationMode);
 
-                // Add timeout to prevent hanging - longer timeout for true mode
+                // Add timeout to prevent hanging - much longer timeout for true mode
                 const controller = new AbortController();
-                const timeoutDuration = computationMode === 'true' ? 60000 : 30000; // 60s for true, 30s for fast
-                const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+                const timeoutDuration = computationMode === 'true' ? 120000 : 30000; // 2 minutes for true, 30s for fast
+                const timeoutId = setTimeout(() => {
+                    console.log(`Request timed out after ${timeoutDuration/1000} seconds`);
+                    controller.abort();
+                }, timeoutDuration);
 
                 const response = await fetch(`${API_BASE}/diagnose`, {
                     method: 'POST',
@@ -813,24 +816,43 @@
             } catch (error) {
                 console.error('Diagnosis error:', error);
                 if (error.name === 'AbortError') {
-                    showError('Diagnosis timed out after 30 seconds. Please try with fewer symptoms or try again.');
+                    const timeoutSeconds = Math.floor(timeoutDuration / 1000);
+                    const modeText = computationMode === 'true' ? 'True Bayesian' : 'Fast';
+                    showError(`${modeText} diagnosis timed out after ${timeoutSeconds} seconds.<br><br>
+                        <strong>Suggestions:</strong><br>
+                        1. Try with fewer symptoms (reduces computation time)<br>
+                        2. Switch to FAST mode for quicker results<br>
+                        3. True Bayesian mode requires more processing time`);
                 } else {
                     showError(`Diagnosis failed: ${error.message}<br><br>
                         <strong>Troubleshooting:</strong><br>
                         1. Try with fewer symptoms<br>
                         2. Check browser console for details<br>
-                        3. Ensure API server is running properly`);
+                        3. Ensure API server is running properly<br>
+                        4. Try switching computation modes`);
                 }
             }
         }
 
         // Show loading state
-        function showLoading() {
+        function showLoading(mode = 'fast') {
             const container = document.getElementById('results-content');
+            
+            let message = 'Analyzing symptoms and calculating probabilities...';
+            let timeEstimate = '';
+            
+            if (mode === 'true') {
+                message = 'Performing True Bayesian computation...';
+                timeEstimate = '<br><small style="color: #666;">This may take 30-120 seconds for accurate results</small>';
+            } else {
+                message = 'Using fast pre-computed probabilities...';
+                timeEstimate = '<br><small style="color: #666;">Should complete in a few seconds</small>';
+            }
+            
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Analyzing symptoms and calculating probabilities...</p>
+                    <p>${message}${timeEstimate}</p>
                 </div>
             `;
         }
