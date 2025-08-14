@@ -565,7 +565,7 @@ async def diagnose_disease(request: DiagnosisRequest):
                 if disease_data is None or not diseases_list:
                     raise HTTPException(status_code=503, detail="Neither Supabase nor CSV data available")
                 
-                # Use CSV-based true Bayesian computation
+                                # Use CSV-based true Bayesian computation
             valid_present_symptoms = [
                 symptom for symptom in request.present_symptoms
                     if symptom in symptoms_list
