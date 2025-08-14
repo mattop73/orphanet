@@ -560,14 +560,78 @@ async def diagnose_disease(request: DiagnosisRequest):
             logger.info("🧮 Using TRUE Bayesian computation with Supabase (full normalization)")
             
             if not supabase_diagnosis or not supabase_diagnosis.is_ready:
-                raise HTTPException(status_code=503, detail="Supabase diagnosis system not ready")
+                logger.error("Supabase diagnosis not ready, falling back to CSV method")
+                # Fallback to CSV-based true Bayesian computation
+                if disease_data is None or not diseases_list:
+                    raise HTTPException(status_code=503, detail="Neither Supabase nor CSV data available")
+                
+                # Use CSV-based true Bayesian computation
+                valid_present_symptoms = [
+                    symptom for symptom in request.present_symptoms
+                    if symptom in symptoms_list
+                ]
+                
+                if not valid_present_symptoms:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="None of the provided symptoms are found in the database"
+                    )
+                
+                valid_absent_symptoms = [
+                    symptom for symptom in request.absent_symptoms
+                    if symptom in symptoms_list
+                ]
+                
+                # Simple CSV-based computation
+                results = []
+                for i, disease in enumerate(diseases_list[:100]):  # Limit to prevent timeout
+                    try:
+                        result = calculate_true_bayesian_probability(
+                            disease,
+                            valid_present_symptoms,
+                            valid_absent_symptoms,
+                            disease_data
+                        )
+                        
+                        if result['probability'] > 0 or len(result['matching_symptoms']) > 0:
+                            disease_info = disease_data[disease_data['disorder_name'] == disease].iloc[0]
+                            
+                            results.append(DiagnosisResult(
+                                disorder_name=disease,
+                                orpha_code=str(disease_info['orpha_code']),
+                                probability=result['probability'],
+                                matching_symptoms=result['matching_symptoms'],
+                                total_symptoms=result['total_symptoms'],
+                                confidence_score=result['confidence_score']
+                            ))
+                    except Exception as e:
+                        logger.warning(f"Error calculating for {disease}: {e}")
+                        continue
+                
+                results.sort(key=lambda x: x.probability, reverse=True)
+                top_results = results[:request.top_n]
+                
+                processing_time = (time.time() - start_time) * 1000
+                
+                return DiagnosisResponse(
+                    success=True,
+                    results=top_results,
+                    total_diseases_evaluated=len(diseases_list[:100]),
+                    input_symptoms=valid_present_symptoms,
+                    processing_time_ms=processing_time,
+                    computation_mode="true"
+                )
             
-            # Use Supabase true Bayesian diagnosis
-            result = supabase_diagnosis.true_bayesian_diagnosis(
-                request.present_symptoms,
-                request.absent_symptoms,
-                request.top_n
-            )
+            try:
+                # Use Supabase true Bayesian diagnosis
+                result = supabase_diagnosis.true_bayesian_diagnosis(
+                    request.present_symptoms,
+                    request.absent_symptoms,
+                    request.top_n
+                )
+            except Exception as e:
+                logger.error(f"Supabase true Bayesian failed: {e}")
+                raise HTTPException(status_code=500, detail=f"True Bayesian computation failed: {str(e)}")
             
             # Convert to API format
             api_results = []

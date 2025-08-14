@@ -541,6 +541,14 @@
                         <p>Select symptoms and click "Diagnose Disease" to see results</p>
                     </div>
                 </div>
+                
+                <!-- Pie Chart Section -->
+                <div id="chart-section" style="display: none; margin-top: 30px;">
+                    <h3 class="section-title">🥧 Top 10 Diseases Distribution</h3>
+                    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                        <canvas id="disease-pie-chart" width="400" height="400"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -770,7 +778,7 @@
                 const requestData = {
                     present_symptoms: presentSymptoms,
                     absent_symptoms: absentSymptoms,
-                    top_n: 10,
+                    top_n: 20,  // Request top 20 results
                     computation_mode: computationMode
                 };
 
@@ -837,6 +845,8 @@
                         <p>No matching diseases found for the selected symptoms.</p>
                     </div>
                 `;
+                // Hide chart section when no results
+                document.getElementById('chart-section').style.display = 'none';
                 return;
             }
 
@@ -898,73 +908,98 @@
                 </div>
             `;
 
-            container.innerHTML = statsHtml + resultsHtml + chartHtml;
+            container.innerHTML = statsHtml + resultsHtml;
 
-            // Create chart
-            createDiagnosisChart(data.results);
+            // Show pie chart section and create chart
+            document.getElementById('chart-section').style.display = 'block';
+            createPieChart(data.results.slice(0, 10)); // Top 10 for pie chart
         }
 
-        // Create diagnosis chart
-        function createDiagnosisChart(results) {
-            const ctx = document.getElementById('diagnosis-chart');
+        // Create pie chart for top 10 diseases
+        let pieChart = null;
+        
+        function createPieChart(results) {
+            const ctx = document.getElementById('disease-pie-chart');
             
-            if (diagnosisChart) {
-                diagnosisChart.destroy();
+            if (pieChart) {
+                pieChart.destroy();
             }
 
-            const top5Results = results.slice(0, 5);
+            // Prepare data for pie chart (top 10)
+            const top10Results = results.slice(0, 10);
+            const labels = top10Results.map(r => {
+                const name = r.disorder_name.length > 25 ? r.disorder_name.substring(0, 25) + '...' : r.disorder_name;
+                return `${name} (${(r.probability * 100).toFixed(1)}%)`;
+            });
             
-            diagnosisChart = new Chart(ctx, {
-                type: 'bar',
+            const probabilities = top10Results.map(r => r.probability * 100);
+            
+            // Generate colors for each slice
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'
+            ];
+
+            pieChart = new Chart(ctx, {
+                type: 'pie',
                 data: {
-                    labels: top5Results.map(r => r.disorder_name.length > 30 ? 
-                        r.disorder_name.substring(0, 30) + '...' : r.disorder_name),
+                    labels: labels,
                     datasets: [{
-                        label: 'Probability (%)',
-                        data: top5Results.map(r => (r.probability * 100).toFixed(2)),
-                        backgroundColor: [
-                            'rgba(79, 172, 254, 0.8)',
-                            'rgba(240, 147, 251, 0.8)',
-                            'rgba(102, 126, 234, 0.8)',
-                            'rgba(118, 75, 162, 0.8)',
-                            'rgba(245, 87, 108, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(79, 172, 254, 1)',
-                            'rgba(240, 147, 251, 1)',
-                            'rgba(102, 126, 234, 1)',
-                            'rgba(118, 75, 162, 1)',
-                            'rgba(245, 87, 108, 1)'
-                        ],
-                        borderWidth: 2
+                        data: probabilities,
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        hoverBorderWidth: 3,
+                        hoverBackgroundColor: colors.map(color => color + 'CC')
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
                     plugins: {
                         legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top 5 Disease Probabilities'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: Math.max(...top5Results.map(r => r.probability * 100)) * 1.2,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                },
+                                generateLabels: function(chart) {
+                                    const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                    const labels = original.call(this, chart);
+                                    labels.forEach((label, index) => {
+                                        label.text = top10Results[index].disorder_name.length > 20 ? 
+                                            top10Results[index].disorder_name.substring(0, 20) + '...' : 
+                                            top10Results[index].disorder_name;
+                                    });
+                                    return labels;
                                 }
                             }
                         },
-                        x: {
-                            ticks: {
-                                maxRotation: 45
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const disease = top10Results[context.dataIndex];
+                                    return [
+                                        `Disease: ${disease.disorder_name}`,
+                                        `Probability: ${(disease.probability * 100).toFixed(2)}%`,
+                                        `Confidence: ${(disease.confidence_score * 100).toFixed(1)}%`,
+                                        `Matching: ${disease.matching_symptoms.length}/${disease.total_symptoms} symptoms`
+                                    ];
+                                }
                             }
+                        }
+                    },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const disease = top10Results[index];
+                            const orphaUrl = `https://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=EN&Expert=${disease.orpha_code}`;
+                            window.open(orphaUrl, '_blank');
                         }
                     }
                 }
@@ -982,6 +1017,8 @@
                     <p>Please check that the API is running and try again.</p>
                 </div>
             `;
+            // Hide chart section on error
+            document.getElementById('chart-section').style.display = 'none';
         }
     </script>
 </body>
