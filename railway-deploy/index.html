@@ -770,11 +770,11 @@
                 return;
             }
 
+            const computationMode = getComputationMode();
             showLoading(computationMode);
             console.log('Starting diagnosis with symptoms:', presentSymptoms);
 
             try {
-                const computationMode = getComputationMode();
                 const requestData = {
                     present_symptoms: presentSymptoms,
                     absent_symptoms: absentSymptoms,
@@ -837,22 +837,10 @@
         // Show loading state
         function showLoading(mode = 'fast') {
             const container = document.getElementById('results-content');
-            
-            let message = 'Analyzing symptoms and calculating probabilities...';
-            let timeEstimate = '';
-            
-            if (mode === 'true') {
-                message = 'Performing True Bayesian computation...';
-                timeEstimate = '<br><small style="color: #666;">This may take 30-120 seconds for accurate results</small>';
-            } else {
-                message = 'Using fast pre-computed probabilities...';
-                timeEstimate = '<br><small style="color: #666;">Should complete in a few seconds</small>';
-            }
-            
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>${message}${timeEstimate}</p>
+                    <p>Analyzing symptoms and calculating probabilities...</p>
                 </div>
             `;
         }
