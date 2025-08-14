@@ -565,7 +565,7 @@ async def diagnose_disease(request: DiagnosisRequest):
                 if disease_data is None or not diseases_list:
                     raise HTTPException(status_code=503, detail="Neither Supabase nor CSV data available")
                 
-                                # Use CSV-based true Bayesian computation
+                # Use CSV-based true Bayesian computation
             valid_present_symptoms = [
                 symptom for symptom in request.present_symptoms
                     if symptom in symptoms_list
@@ -577,8 +577,8 @@ async def diagnose_disease(request: DiagnosisRequest):
                     detail="None of the provided symptoms are found in the database"
                 )
             
-            valid_absent_symptoms = [
-                symptom for symptom in request.absent_symptoms
+                valid_absent_symptoms = [
+                    symptom for symptom in request.absent_symptoms
                     if symptom in symptoms_list
                 ]
                 
@@ -587,7 +587,7 @@ async def diagnose_disease(request: DiagnosisRequest):
                 # Limit to diseases that have at least one matching symptom for efficiency
                 relevant_diseases = set()
                 for symptom in valid_present_symptoms:
-                    matching_diseases = disease_data[disease_data['hpo_term'] == symptom]['disorder_name'].unique()
+                    matching_diseases = disease_data[disease_data["hpo_term"] == symptom]["disorder_name"].unique()
                     relevant_diseases.update(matching_diseases)
                 
                 # Limit to top 5 most relevant diseases to prevent timeout
