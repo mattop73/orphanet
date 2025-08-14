@@ -28,25 +28,20 @@ class SupabaseDiagnosis:
     """Supabase-based diagnosis system supporting both fast and true Bayesian modes"""
     
     def __init__(self):
-        """Initialize Supabase client"""
+        """Initialize Supabase client with service key"""
         self.supabase_url = os.getenv('SUPABASE_URL')
-        
-        # Try service role key first (for data loading), then anon key
         self.supabase_service_key = os.getenv('SUPABASE_SERVICE_KEY')
-        self.supabase_anon_key = os.getenv('SUPABASE_ANON_KEY') or os.getenv('SUPABASE_KEY')
         
         if not self.supabase_url:
             raise ValueError("Missing SUPABASE_URL in environment")
         
-        if not self.supabase_service_key and not self.supabase_anon_key:
-            raise ValueError("Missing SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY in environment")
-        
-        # Use service key for data operations if available, otherwise anon key
-        primary_key = self.supabase_service_key if self.supabase_service_key else self.supabase_anon_key
+        if not self.supabase_service_key:
+            raise ValueError("Missing SUPABASE_SERVICE_KEY in environment")
         
         try:
-            self.supabase: Client = create_client(self.supabase_url, primary_key)
-            logger.info(f"🔑 Using {'service role' if self.supabase_service_key else 'anon'} key for Supabase")
+            # Always use service key for full database access
+            self.supabase: Client = create_client(self.supabase_url, self.supabase_service_key)
+            logger.info(f"🔑 Connected to Supabase with service role key")
         except Exception as e:
             logger.error(f"❌ Failed to create Supabase client: {e}")
             raise ValueError(f"Failed to initialize Supabase client: {e}")
@@ -60,58 +55,80 @@ class SupabaseDiagnosis:
         self.CACHE_DURATION = 300  # 5 minutes
     
     def test_connection(self) -> bool:
-        """Test Supabase connection"""
+        """Test Supabase connection using new schema"""
         try:
-            # Simple test query - try disorder_symptoms_view first, fallback to disorders
+            # Test with the new schema tables
             try:
-                result = self.supabase.table('disorder_symptoms_view').select('count').limit(1).execute()
-            except:
                 result = self.supabase.table('disorders').select('count').limit(1).execute()
-            logger.info("✅ Supabase connection successful")
-            return True
+                logger.info("✅ Supabase connection successful - disorders table accessible")
+                return True
+            except Exception as e:
+                logger.warning(f"disorders table test failed: {e}")
+                
+            # Fallback test with hpo_terms
+            try:
+                result = self.supabase.table('hpo_terms').select('count').limit(1).execute()
+                logger.info("✅ Supabase connection successful - hpo_terms table accessible")
+                return True
+            except Exception as e:
+                logger.error(f"❌ All connection tests failed: {e}")
+                return False
+                
         except Exception as e:
             logger.error(f"❌ Supabase connection failed: {e}")
             return False
     
     def get_symptoms(self, search: str = None, limit: int = 50) -> List[str]:
-        """Get symptoms from Supabase"""
+        """Get symptoms from Supabase using the new schema"""
         try:
-            # Try fast_symptoms first, fallback to hpo_terms
+            # Try fast_symptoms first for performance
             try:
                 query = self.supabase.table('fast_symptoms').select('symptom_name')
                 if search:
                     query = query.ilike('symptom_name', f'%{search}%')
                 result = query.order('symptom_count', desc=True).limit(limit).execute()
                 return [row['symptom_name'] for row in result.data]
-            except:
-                # Fallback to hpo_terms table
-                query = self.supabase.table('hpo_terms').select('hpo_term')
+            except Exception as e:
+                logger.warning(f"fast_symptoms query failed: {e}")
+            
+            # Fallback to hpo_terms table with correct column name
+            try:
+                query = self.supabase.table('hpo_terms').select('term')
                 if search:
-                    query = query.ilike('hpo_term', f'%{search}%')
+                    query = query.ilike('term', f'%{search}%')
                 result = query.limit(limit).execute()
-                return [row['hpo_term'] for row in result.data]
+                return [row['term'] for row in result.data]
+            except Exception as e:
+                logger.warning(f"hpo_terms query failed: {e}")
+                return []
             
         except Exception as e:
             logger.error(f"Error getting symptoms: {e}")
             return []
     
     def get_diseases(self, search: str = None, limit: int = 50) -> List[Dict[str, Any]]:
-        """Get diseases from Supabase"""
+        """Get diseases from Supabase using the new schema"""
         try:
-            # Try fast_diseases first, fallback to disorders
+            # Try fast_diseases first for performance
             try:
                 query = self.supabase.table('fast_diseases').select('disease_name, orpha_code, symptom_count')
                 if search:
                     query = query.ilike('disease_name', f'%{search}%')
                 result = query.order('symptom_count', desc=True).limit(limit).execute()
                 return result.data
-            except:
-                # Fallback to disorders table
-                query = self.supabase.table('disorders').select('disorder_name, orpha_code')
+            except Exception as e:
+                logger.warning(f"fast_diseases query failed: {e}")
+            
+            # Fallback to disorders table with correct column names
+            try:
+                query = self.supabase.table('disorders').select('name, orpha_code')
                 if search:
-                    query = query.ilike('disorder_name', f'%{search}%')
+                    query = query.ilike('name', f'%{search}%')
                 result = query.limit(limit).execute()
-                return [{'disease_name': row['disorder_name'], 'orpha_code': row['orpha_code'], 'symptom_count': 0} for row in result.data]
+                return [{'disease_name': row['name'], 'orpha_code': row['orpha_code'], 'symptom_count': 0} for row in result.data]
+            except Exception as e:
+                logger.warning(f"disorders query failed: {e}")
+                return []
                 
         except Exception as e:
             logger.error(f"Error getting diseases: {e}")
@@ -216,30 +233,31 @@ class SupabaseDiagnosis:
             logger.info("📊 Fetching all disorder-symptom data from Supabase...")
             
             try:
-                # Try disorder_symptoms_view first (optimized view)
-                result = self.supabase.table('disorder_symptoms_view')\
-                    .select('disorder_name, orpha_code, hpo_term, hpo_frequency')\
-                    .execute()
-                all_data = result.data
-                logger.info(f"✅ Loaded {len(all_data)} associations from disorder_symptoms_view")
-            except:
-                # Fallback to join query
-                logger.info("Falling back to join query...")
-                result = self.supabase.table('hpo_associations')\
-                    .select('disorders(disorder_name, orpha_code), hpo_terms(hpo_term), hpo_frequency')\
+                # Use the new schema with proper joins
+                logger.info("Using new normalized schema with joins...")
+                result = self.supabase.table('disorder_hpo_associations')\
+                    .select('''
+                        frequency,
+                        disorders(name, orpha_code),
+                        hpo_terms(term)
+                    ''')\
+                    .limit(10000)\
                     .execute()
                 
-                # Transform the joined data
+                # Transform the joined data to match expected format
                 all_data = []
                 for row in result.data:
                     if row.get('disorders') and row.get('hpo_terms'):
                         all_data.append({
-                            'disorder_name': row['disorders']['disorder_name'],
+                            'disorder_name': row['disorders']['name'],
                             'orpha_code': row['disorders']['orpha_code'],
-                            'hpo_term': row['hpo_terms']['hpo_term'],
-                            'hpo_frequency': row.get('hpo_frequency', 'Unknown')
+                            'hpo_term': row['hpo_terms']['term'],
+                            'hpo_frequency': row.get('frequency', 'Unknown')
                         })
-                logger.info(f"✅ Loaded {len(all_data)} associations from join query")
+                logger.info(f"✅ Loaded {len(all_data)} associations from new schema")
+            except Exception as e:
+                logger.error(f"Failed to load from new schema: {e}")
+                raise Exception(f"Could not load disorder-symptom associations: {e}")
             
             if not all_data:
                 raise Exception("No disease-symptom data found in Supabase")

@@ -774,8 +774,8 @@
             showLoading(computationMode);
             console.log('Starting diagnosis with symptoms:', presentSymptoms);
 
-            // Set timeout duration based on mode - much longer for true mode
-            const timeoutDuration = computationMode === 'true' ? 300000 : 30000; // 5 minutes for true, 30s for fast
+            // Set timeout duration based on mode - reasonable timeouts
+            const timeoutDuration = computationMode === 'true' ? 60000 : 30000; // 1 minute for true, 30s for fast
 
             try {
                 const requestData = {

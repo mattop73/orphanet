@@ -566,23 +566,23 @@ async def diagnose_disease(request: DiagnosisRequest):
                     raise HTTPException(status_code=503, detail="Neither Supabase nor CSV data available")
                 
                 # Use CSV-based true Bayesian computation
-                valid_present_symptoms = [
-                    symptom for symptom in request.present_symptoms
+            valid_present_symptoms = [
+                symptom for symptom in request.present_symptoms
+                    if symptom in symptoms_list
+            ]
+            
+            if not valid_present_symptoms:
+                raise HTTPException(
+                    status_code=400,
+                    detail="None of the provided symptoms are found in the database"
+                )
+            
+            valid_absent_symptoms = [
+                symptom for symptom in request.absent_symptoms
                     if symptom in symptoms_list
                 ]
                 
-                if not valid_present_symptoms:
-                    raise HTTPException(
-                        status_code=400,
-                        detail="None of the provided symptoms are found in the database"
-                    )
-                
-                valid_absent_symptoms = [
-                    symptom for symptom in request.absent_symptoms
-                    if symptom in symptoms_list
-                ]
-                
-                # Simple CSV-based computation (limited for performance)
+                # Ultra-fast simplified Bayesian computation (CSV fallback)
                 results = []
                 # Limit to diseases that have at least one matching symptom for efficiency
                 relevant_diseases = set()
@@ -590,30 +590,58 @@ async def diagnose_disease(request: DiagnosisRequest):
                     matching_diseases = disease_data[disease_data['hpo_term'] == symptom]['disorder_name'].unique()
                     relevant_diseases.update(matching_diseases)
                 
-                # Limit to top 20 most relevant diseases to prevent timeout
-                relevant_diseases = list(relevant_diseases)[:20]
-                logger.info(f"Computing for {len(relevant_diseases)} relevant diseases (CSV fallback)")
+                # Limit to top 5 most relevant diseases to prevent timeout
+                relevant_diseases = list(relevant_diseases)[:5]
+                logger.info(f"Computing for {len(relevant_diseases)} relevant diseases (CSV fallback - ultra fast)")
                 
+                # Fast scoring without full Bayesian normalization
                 for i, disease in enumerate(relevant_diseases):
                     try:
-                        result = calculate_true_bayesian_probability(
-                            disease,
-                            valid_present_symptoms,
-                            valid_absent_symptoms,
-                            disease_data
-                        )
+                        # Get disease-specific data
+                        disease_symptoms = disease_data[disease_data['disorder_name'] == disease]
                         
-                        if result['probability'] > 0 or len(result['matching_symptoms']) > 0:
-                            disease_info = disease_data[disease_data['disorder_name'] == disease].iloc[0]
+                        if disease_symptoms.empty:
+                            continue
+                        
+                        # Create symptom frequency map
+                        symptom_freq_map = dict(zip(disease_symptoms['hpo_term'], disease_symptoms['frequency_numeric']))
+                        
+                        # Calculate simple score based on matching symptoms
+                        score = 0.0
+                        matching_symptoms = []
+                        
+                        # Score present symptoms
+                        for symptom in valid_present_symptoms:
+                            if symptom in symptom_freq_map:
+                                freq = symptom_freq_map[symptom]
+                                score += freq  # Add frequency directly
+                                matching_symptoms.append(symptom)
+                        
+                        # Penalize for absent symptoms that should be present
+                        for symptom in valid_absent_symptoms:
+                            if symptom in symptom_freq_map:
+                                freq = symptom_freq_map[symptom]
+                                score -= freq * 0.5  # Subtract half the frequency
+                        
+                        # Normalize by number of present symptoms to get average
+                        if len(valid_present_symptoms) > 0:
+                            normalized_score = score / len(valid_present_symptoms)
+                        else:
+                            normalized_score = 0.0
+                        
+                        # Only include if we have matches
+                        if len(matching_symptoms) > 0:
+                            disease_info = disease_symptoms.iloc[0]
                             
                             results.append(DiagnosisResult(
                                 disorder_name=disease,
                                 orpha_code=str(disease_info['orpha_code']),
-                                probability=result['probability'],
-                                matching_symptoms=result['matching_symptoms'],
-                                total_symptoms=result['total_symptoms'],
-                                confidence_score=result['confidence_score']
+                                probability=max(0.0, min(1.0, normalized_score)),  # Clamp to [0,1]
+                                matching_symptoms=matching_symptoms,
+                                total_symptoms=len(disease_symptoms),
+                                confidence_score=len(matching_symptoms) / len(valid_present_symptoms) if valid_present_symptoms else 0.0
                             ))
+                            
                     except Exception as e:
                         logger.warning(f"Error calculating for {disease}: {e}")
                         continue

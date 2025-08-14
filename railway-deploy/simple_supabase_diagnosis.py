@@ -22,15 +22,15 @@ class SimpleSupabaseDiagnosis:
     """Simple HTTP-based Supabase diagnosis system"""
     
     def __init__(self):
-        """Initialize with direct HTTP client"""
+        """Initialize with direct HTTP client using service key"""
         self.supabase_url = os.getenv('SUPABASE_URL')
-        self.supabase_key = os.getenv('SUPABASE_KEY') or os.getenv('SUPABASE_ANON_KEY')
+        self.supabase_key = os.getenv('SUPABASE_SERVICE_KEY')
         
         if not self.supabase_url:
             raise ValueError("Missing SUPABASE_URL in environment")
         
         if not self.supabase_key:
-            raise ValueError("Missing SUPABASE_KEY in environment")
+            raise ValueError("Missing SUPABASE_SERVICE_KEY in environment")
         
         # Clean URL
         self.supabase_url = self.supabase_url.rstrip('/')
